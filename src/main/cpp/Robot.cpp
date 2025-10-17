@@ -19,6 +19,8 @@ int main() {
     Hardware hard;
     Movement move( &hard );
     Oms oms( &hard );
+    OI oi;
+    Drive drive( &hard, &move, &oi );
 
     delay(1000);
 
@@ -31,38 +33,42 @@ while(1){
         //delay(50);
      while( hard.GetStartButton() ){ move.ShuffleBoardUpdate();delay(150); }
 
-     hard.SetRunningLED(true);
-     hard.SetStoppedLED(false);
+    //  hard.SetRunningLED(true);
+    //  hard.SetStoppedLED(false);
 
-     move.SetPosition( 0, 0, 0 ); 
+    //  move.SetPosition( 0, 0, 0 ); 
      
-    //  move.PositionDriver(100,100,180);
-    //  delay(1000);
-    //  move.PositionDriver(0,0,0);
+    // //  move.PositionDriver(100,100,180);
+    // //  delay(1000);
+    // //  move.PositionDriver(0,0,0);
    
     
-    //  move.PositionDriver(80,80,90);move.SetPosition( 0, 0, 0 ); 
-    //  move.PositionDriver(50,50,0);move.SetPosition( 0, 0, 0 ); 
-    //  move.PositionDriver(-50,-50,0);move.SetPosition( 0, 0, 0 ); 
-    //  move.PositionDriver(0,0,-90);move.SetPosition( 0, 0, 0 );
-    //  move.PositionDriver(70,0,0);move.SetPosition( 0, 0, 0 );
-    // move.PositionDriver(-80,-80,0);move.SetPosition( 0, 0, 0 );
-    // move.PositionDriver(-70,0,0);move.SetPosition( 0, 0, 0 );
+    // //  move.PositionDriver(80,80,90);move.SetPosition( 0, 0, 0 ); 
+    // //  move.PositionDriver(50,50,0);move.SetPosition( 0, 0, 0 ); 
+    // //  move.PositionDriver(-50,-50,0);move.SetPosition( 0, 0, 0 ); 
+    // //  move.PositionDriver(0,0,-90);move.SetPosition( 0, 0, 0 );
+    // //  move.PositionDriver(70,0,0);move.SetPosition( 0, 0, 0 );
+    // // move.PositionDriver(-80,-80,0);move.SetPosition( 0, 0, 0 );
+    // // move.PositionDriver(-70,0,0);move.SetPosition( 0, 0, 0 );
     
         
-    // move.DriveStraight(100);
-     //move.DriveStraight(-50);
-    // move.SideWalk(100);
-     //move.SideWalk(-100);
+    // // move.DriveStraight(100);
+    //  //move.DriveStraight(-50);
+    // // move.SideWalk(100);
+    //  //move.SideWalk(-100);
 
      
-    oms.oms_driver(20);
+    // oms.oms_driver(20);
     
-    oms.SetGripper(move.servo_current_angle);
+    // oms.SetGripper(move.servo_current_angle);
 
-     hard.SetRunningLED(false);
-     hard.SetStoppedLED(true);
+    //  hard.SetRunningLED(false);
+    //  hard.SetStoppedLED(true);
+    while (true){
+        drive.Execute();
+        delay(100);
+    }
      
-}
+    }
     return 0; 
 }

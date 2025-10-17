@@ -20,6 +20,7 @@
 #include "Hardware.h"
 #include "Movement.h"
 #include "Oms.h"
+#include "ManualDrive.h"
 
 class Robot : public frc::TimedRobot {
  public:
