@@ -81,15 +81,15 @@ class Hardware
         studica::TitanQuadEncoder RightEncoder    {RightMotor,    constant::RIGHT_MOTOR,    constant::DIST_PER_TICK};
         studica::TitanQuadEncoder ElevatorEncoder {ElevatorMotor, constant::ELEVATOR_MOTOR, constant::DIST_PER_TICK};
 
-        studica::Servo servo{8};
+        studica::Servo servo{9};
 
         AHRS navX{frc::SPI::Port::kMXP};
 
         frc::DigitalInput startButton{constant::START_BUTTON};
         frc::DigitalInput  stopButton{constant::STOP_BUTTON};
 
-        frc::DigitalInput limit_high{8};
-        frc::DigitalInput limit_low {9};
+        frc::DigitalInput limit_high{2};
+        frc::DigitalInput limit_low {10};
 
         frc::AnalogInput right_sharp{2};
         frc::AnalogInput left_sharp{3};

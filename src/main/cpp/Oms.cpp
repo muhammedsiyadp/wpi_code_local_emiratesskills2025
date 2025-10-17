@@ -22,19 +22,19 @@ void Oms::oms_driver( double desired_height ){
 
         height = height + delta_elev;
 
-        if( !hardware->GetLimitHigh() ){ height = 40; }
-        if( !hardware->GetLimitLow()  ){ height = 10; }
+        if( !hardware->GetLimitHigh() ){ height = 35; }
+        //if( !hardware->GetLimitLow()  ){ height = 10; }
 
 
         double elev_diff = desired_height - height;
 
-        double max_linear_speed = 12; // cm/s
+        double max_linear_speed = 40; // cm/s
 
         double desired_v = (elev_diff / 5.0) * max_linear_speed; // [cm/s]
         if     ( desired_v >  max_linear_speed ){ desired_v =  max_linear_speed; }
         else if( desired_v < -max_linear_speed ){ desired_v = -max_linear_speed; }
 
-        if( abs(elev_diff) < 2 )  { desired_v = 0; break; }
+        if( abs(elev_diff) < 1 )  { desired_v = 0; break; }
 
 
         if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed

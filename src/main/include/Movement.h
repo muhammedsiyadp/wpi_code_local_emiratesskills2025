@@ -49,6 +49,7 @@ class Movement
         double desired_back_speed; 
         double desired_left_speed; 
         double desired_right_speed;
+        double servo_current_angle = 90;
 
     private:
 

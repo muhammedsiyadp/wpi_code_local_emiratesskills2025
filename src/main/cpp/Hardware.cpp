@@ -146,9 +146,11 @@ double Hardware::getFrontAverageDistance() {
 
 
 bool Hardware::GetLimitHigh(){
-    return limit_high.Get();
+    //return limit_high.Get();
+    return ElevatorMotor.GetLimitSwitch(0);
 }
 
 bool Hardware::GetLimitLow(){
-    return limit_low.Get();
+    //return limit_low.Get();
+    return ElevatorMotor.GetLimitSwitch(1);
 }

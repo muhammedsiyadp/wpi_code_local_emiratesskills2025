@@ -198,6 +198,19 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("Right SharpIR",  hardware->getFrontDistance_R( ) );
     frc::SmartDashboard::PutNumber("Left SharpIR",  hardware->getFrontDistance_L( ) );
 
+    frc::SmartDashboard::PutNumber("Left Cobra",  hardware->GetCobra(0) );
+    frc::SmartDashboard::PutNumber("Left_c Cobra",  hardware->GetCobra(1) );
+    frc::SmartDashboard::PutNumber("Right_c Cobra",  hardware->GetCobra(2) );
+    frc::SmartDashboard::PutNumber("Right Cobra",  hardware->GetCobra(3) );
+
+    frc::SmartDashboard::PutNumber("Limit High",  hardware->GetLimitHigh() );
+    frc::SmartDashboard::PutNumber("Limit Low",  hardware->GetLimitLow() );
+    frc::SmartDashboard::PutNumber("Heading",  1);//hardware->GetYaw() );
+    servo_current_angle = frc::SmartDashboard::GetNumber("servo_angle",90);
+    
+
+    
+
 }
 
 double Movement::get_x() { return x_global;  }

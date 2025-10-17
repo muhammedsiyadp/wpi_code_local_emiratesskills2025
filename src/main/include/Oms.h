@@ -19,7 +19,7 @@ class Oms
         void SetGripper( double angle );
         void oms_home();
 
-        double height = 1000;
+        double height = -1000;
 
     private:
 
