@@ -12,6 +12,7 @@
 
 #include <string>
 #include <iostream>
+#include <thread>
 
 #include <frc/TimedRobot.h>
 #include <studica/MockDS.h>

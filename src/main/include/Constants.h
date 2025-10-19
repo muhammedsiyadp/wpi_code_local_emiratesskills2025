@@ -44,10 +44,21 @@ namespace constant
 
     // Ultrasonic
     static constexpr int RIGHT_TRIG    = 15;
-    static constexpr int RIGHT_ECHO     = 11;
-    static constexpr int LEFT_TRIG    = 14;
+    static constexpr int RIGHT_ECHO    = 11;
+    static constexpr int LEFT_TRIG     = 14;
     static constexpr int LEFT_ECHO     = 10;
 
+    // Elevator limits
+    static constexpr int ELEVATOR_LIMIT_HIGH_HEIGHT   = 35;
+    static constexpr int ELEVATOR_LIMIT_LOW_HEIGHT    = 0;
+    static constexpr double ELEVATOR_MAX_SPEED        = 40.0; 
+    static constexpr float ELEVATOR_POSITION_TOLERANCE = 0.5; // [cm]
+    static constexpr float ELEVATOR_MOVE_SPEED         = 1; // [cm]/button press in teleop mode
+
+    // Gripper 
+    static constexpr double GRIPPER_CONTRACTED_ANGLE = 90.0;
+    static constexpr double GRIPPER_EXPANDED_ANGLE =  0.0;
+    static constexpr double GRIPPER_MOVEMENT_SPEED = 1.0; // degrees per button press
 
 
 }

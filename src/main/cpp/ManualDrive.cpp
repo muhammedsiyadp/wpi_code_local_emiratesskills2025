@@ -19,6 +19,11 @@ void Drive::Execute()
     inputLeftY  = -oi->GetLeftDriveX();
     inputRightY = -oi->GetRightDriveY();
     inputRightX = -oi->GetRightDriveX();
+
+    elevator_up_key_pressed = oi->GetDriveRightTrigger();
+    elevator_down_key_pressed = oi->GetDriveLeftTrigger();
+    servo_left_pressed = oi->GetDriveLeftBumper();
+    servo_right_pressed = oi->GetDriveRightBumper();
     
     double vx = 0;
     double vy = 0;
@@ -75,5 +80,21 @@ void Drive::Execute()
 
     // std::cout << "vx: " << vx << " vy: " << vy << " vth: " << vth << std::endl;
     std::cout << "inputLeftY: " << inputLeftY << " inputLeftX: " << inputLeftX << " inputRightY: " << inputRightY << " inputRightX: " << inputRightX << std::endl;
+
+    //code for OMS
+    if (elevator_up_key_pressed ){
+        oms->elevator_move_height(constant::ELEVATOR_MOVE_SPEED);
+    }
+    else if (elevator_down_key_pressed ){
+        oms->elevator_move_height(-constant::ELEVATOR_MOVE_SPEED);
+    }
+    if (servo_left_pressed ){
+        oms->MoveGripper(constant::GRIPPER_MOVEMENT_SPEED);
+    }
+    else if (servo_right_pressed ){
+        oms->MoveGripper(-constant::GRIPPER_MOVEMENT_SPEED);
+    }
+
+
 
 }   

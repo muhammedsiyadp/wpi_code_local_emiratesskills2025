@@ -20,7 +20,9 @@ int main() {
     Movement move( &hard );
     Oms oms( &hard );
     OI oi;
-    Drive drive( &hard, &move, &oi );
+    Drive drive( &hard, &move, &oi, &oms );
+
+    std::thread oms_thread(&Oms::oms_maintain_height, &oms); // Start the elevator maintain height in a separate thread (background)
 
     delay(1000);
 
@@ -58,7 +60,7 @@ while(1){
     //  //move.SideWalk(-100);
 
      
-    // oms.oms_driver(20);
+    // oms.elevator_set_height(20);
     
     // oms.SetGripper(move.servo_current_angle);
 

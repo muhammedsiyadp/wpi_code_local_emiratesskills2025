@@ -13,6 +13,7 @@
 #include "Hardware.h"
 #include "Movement.h"
 #include "OI.h"
+#include "Oms.h"
 
 #include <iostream>
 
@@ -20,13 +21,14 @@
 class Drive
 {
     public:
-        Drive( Hardware * h, Movement * m, OI * o ) : hardware{h}, move{m}, oi{o}{}
+        Drive( Hardware * h, Movement * m, OI * o , Oms * om) : hardware{h}, move{m}, oi{o}, oms{om} {};
         void Execute();
     
     private:
         Movement * move;
         Hardware * hardware;
         OI* oi;
+        Oms* oms;
 
         double inputLeftY = 0;
         double inputLeftX = 0;
@@ -42,5 +44,10 @@ class Drive
         static constexpr double RAMP_DOWN = 5.0;
 
         static constexpr double DELTA_LIMIT = 0.4;
+
+        bool elevator_up_key_pressed = false;
+        bool elevator_down_key_pressed = false;
+        bool servo_left_pressed = false;
+        bool servo_right_pressed = false;
 
 };
