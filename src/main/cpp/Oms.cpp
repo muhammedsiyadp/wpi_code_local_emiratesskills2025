@@ -1,6 +1,7 @@
 #include "Oms.h"
 
 void Oms::elevator_set_height( double desired_height , bool async ){
+    desired_height = std::clamp( desired_height, (double)constant::ELEVATOR_LIMIT_LOW_HEIGHT, (double)constant::ELEVATOR_LIMIT_HIGH_HEIGHT );
     elevator_target_height = desired_height;
     elevator_on_target = false;
     if (!async)
