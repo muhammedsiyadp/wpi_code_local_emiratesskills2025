@@ -15,8 +15,8 @@ class Oms
     public:
         Oms( Hardware * h ) : hardware{h}{}
 
-        void elevator_set_height( double desired_height, bool async = false );
-        void elevator_move_height( double delta_height , bool async = false );
+        void elevator_set_height( double desired_height, bool async = true );
+        void elevator_move_height( double delta_height , bool async = true );
         void oms_maintain_height();
         void SetGripper( double angle );
         void MoveGripper(int delta_angle);
@@ -28,7 +28,7 @@ class Oms
 
         Hardware * hardware;
 
-        double elevator_target_height = 0;
+        double elevator_target_height = constant::ELEVATOR_LIMIT_HIGH_HEIGHT;
         bool elevator_on_target = false;
 
 };

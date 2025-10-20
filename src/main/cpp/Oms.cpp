@@ -7,7 +7,7 @@ void Oms::elevator_set_height( double desired_height , bool async ){
     {
         while ( !elevator_on_target )
         {
-            delay(20);
+            delay(100);
         }
     }
 
@@ -74,5 +74,16 @@ void Oms::SetGripper( double angle ){
 }
 void Oms::MoveGripper(int delta_angle){
     cur_gripper_angle += delta_angle;
+
+    int lowest_angle, highest_angle;
+    if (constant::GRIPPER_EXPANDED_ANGLE < constant::GRIPPER_CONTRACTED_ANGLE){
+        lowest_angle = constant::GRIPPER_EXPANDED_ANGLE;
+        highest_angle = constant::GRIPPER_CONTRACTED_ANGLE;
+    }
+    else {
+        lowest_angle = constant::GRIPPER_CONTRACTED_ANGLE;
+        highest_angle = constant::GRIPPER_EXPANDED_ANGLE;
+    }
+    std::clamp(cur_gripper_angle, lowest_angle, highest_angle);
     hardware->SetGripper( cur_gripper_angle );
 }

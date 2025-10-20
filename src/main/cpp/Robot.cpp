@@ -2,9 +2,9 @@
  * Author: Felipe Ferreira
  * Release version: 1.0.0.0
  * 
- * Modified by: 
- * Last modification date: 
- * New version:
+ * Modified by: Muhammed siyad p
+ * Last modification date: 20-10-2025
+ * New version: 1.1.0.0
 
 *************************************/
 
@@ -68,7 +68,7 @@ while(1){
     //  hard.SetStoppedLED(true);
     while (true){
         drive.Execute();
-        delay(100);
+        delay(50);
     }
      
     }
