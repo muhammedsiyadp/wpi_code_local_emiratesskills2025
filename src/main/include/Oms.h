@@ -20,12 +20,15 @@ class Oms
         void oms_maintain_height();
         void SetGripper( double angle );
         void MoveGripper(int delta_angle);
+        void OpenGripper();
+        void CloseGripper();
 
         double cur_elevator_height = -1000;
-        int cur_gripper_angle = constant::GRIPPER_CONTRACTED_ANGLE;
+        int cur_gripper_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
 
     private:
-
+        int gripper_close_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
+        int gripper_open_angle = constant::INITIAL_GRIPPER_OPEN_ANGLE;
         Hardware * hardware;
 
         double elevator_target_height = constant::ELEVATOR_LIMIT_HIGH_HEIGHT;

@@ -57,8 +57,8 @@ namespace constant
     static constexpr float ELEVATOR_FAST_MOVE_FACTOR   = 4.0; // Multiplier for fast elevator movement
 
     // Gripper 
-    static constexpr double GRIPPER_CONTRACTED_ANGLE = 90.0;
-    static constexpr double GRIPPER_EXPANDED_ANGLE =  0.0;
+    static constexpr double INITIAL_GRIPPER_CLOSE_ANGLE = 90.0;
+    static constexpr double INITIAL_GRIPPER_OPEN_ANGLE =  0.0;
     static constexpr double GRIPPER_MOVEMENT_SPEED = 5.0; // degrees per button press
 
 

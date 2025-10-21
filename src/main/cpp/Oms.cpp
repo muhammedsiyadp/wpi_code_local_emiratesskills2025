@@ -62,6 +62,10 @@ void Oms::oms_maintain_height(){
 
         frc::SmartDashboard::PutNumber("cur_elevator_height",  cur_elevator_height );
         frc::SmartDashboard::PutNumber("Battery Voltage",  hardware->GetBatteryVoltage() );
+        frc::SmartDashboard::PutNumber("Gripper closed angle", gripper_close_angle );
+        frc::SmartDashboard::PutNumber("Gripper opened angle", gripper_open_angle );
+        gripper_close_angle = frc::SmartDashboard::GetNumber("Gripper closed angle", gripper_close_angle );
+        gripper_open_angle = frc::SmartDashboard::GetNumber("Gripper opened angle", gripper_open_angle );
 
 
         delay( delta_time * 1000 );
@@ -83,3 +87,10 @@ void Oms::MoveGripper(int delta_angle){
     frc::SmartDashboard::PutNumber("Servo Pos", cur_gripper_angle );
     hardware->SetGripper( cur_gripper_angle );
 }
+void Oms::CloseGripper(){
+    SetGripper( gripper_close_angle );
+}
+void Oms::OpenGripper(){
+    SetGripper( gripper_open_angle );
+}
+

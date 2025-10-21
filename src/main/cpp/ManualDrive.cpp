@@ -25,8 +25,12 @@ void Drive::Execute()
     elevator_down_key_pressed = oi->GetDriveLeftTrigger();
     servo_left_pressed = oi->GetDriveLeftBumper();
     servo_right_pressed = oi->GetDriveRightBumper();
+    gripper_close_pressed = oi->GetDriveCircleButton();
+    gripper_open_pressed = oi->GetDriveSquareButton();
+
 
     pov_position = oi->GetDrivePOV();
+
 
     
     double vx = 0;
@@ -104,6 +108,12 @@ void Drive::Execute()
     }
     else if (pov_position == 180){ // Down
         oms->elevator_move_height(-constant::ELEVATOR_MOVE_SPEED, false);
+    }
+    if (gripper_close_pressed){
+        oms->CloseGripper();
+    }
+    else if (gripper_open_pressed){
+        oms->OpenGripper();
     }
 
 
