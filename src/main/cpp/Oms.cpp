@@ -61,6 +61,7 @@ void Oms::oms_maintain_height(){
         }
 
         frc::SmartDashboard::PutNumber("cur_elevator_height",  cur_elevator_height );
+        frc::SmartDashboard::PutNumber("Battery Voltage",  hardware->GetBatteryVoltage() );
 
 
         delay( delta_time * 1000 );
