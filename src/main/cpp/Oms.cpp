@@ -13,8 +13,9 @@ void Oms::elevator_set_height( double desired_height , bool async ){
     }
 
 }
-void Oms::elevator_move_height( double delta_height , bool async ){
-    elevator_set_height( cur_elevator_height + delta_height , async );
+void Oms::elevator_move_height( double delta_height , bool fast , bool async ){
+    if (fast) elevator_set_height( cur_elevator_height + delta_height * constant::ELEVATOR_FAST_MOVE_FACTOR, async );
+    else      elevator_set_height( cur_elevator_height + delta_height  ,async );
 }
 
 void Oms::oms_maintain_height(){
@@ -71,20 +72,13 @@ void Oms::oms_maintain_height(){
 }
 void Oms::SetGripper( double angle ){
     cur_gripper_angle = angle;
+    std::clamp( cur_gripper_angle, 0, 300 );
+    frc::SmartDashboard::PutNumber("Servo Pos", cur_gripper_angle );
     hardware->SetGripper( cur_gripper_angle );
 }
 void Oms::MoveGripper(int delta_angle){
     cur_gripper_angle += delta_angle;
-
-    int lowest_angle, highest_angle;
-    if (constant::GRIPPER_EXPANDED_ANGLE < constant::GRIPPER_CONTRACTED_ANGLE){
-        lowest_angle = constant::GRIPPER_EXPANDED_ANGLE;
-        highest_angle = constant::GRIPPER_CONTRACTED_ANGLE;
-    }
-    else {
-        lowest_angle = constant::GRIPPER_CONTRACTED_ANGLE;
-        highest_angle = constant::GRIPPER_EXPANDED_ANGLE;
-    }
-    std::clamp(cur_gripper_angle, lowest_angle, highest_angle);
+    cur_gripper_angle = std::clamp( cur_gripper_angle, 0, 300 );
+    frc::SmartDashboard::PutNumber("Servo Pos", cur_gripper_angle );
     hardware->SetGripper( cur_gripper_angle );
 }

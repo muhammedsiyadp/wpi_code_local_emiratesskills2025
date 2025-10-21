@@ -54,11 +54,13 @@ namespace constant
     static constexpr double ELEVATOR_MAX_SPEED        = 70.0; 
     static constexpr float ELEVATOR_POSITION_TOLERANCE = 0.5; // [cm]
     static constexpr float ELEVATOR_MOVE_SPEED         = 1; // [cm]/button press in teleop mode
+    static constexpr float ELEVATOR_FAST_MOVE_FACTOR   = 4.0; // Multiplier for fast elevator movement
 
     // Gripper 
     static constexpr double GRIPPER_CONTRACTED_ANGLE = 90.0;
     static constexpr double GRIPPER_EXPANDED_ANGLE =  0.0;
     static constexpr double GRIPPER_MOVEMENT_SPEED = 5.0; // degrees per button press
+
 
 
 }

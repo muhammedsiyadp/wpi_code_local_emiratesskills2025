@@ -20,10 +20,14 @@ void Drive::Execute()
     inputRightY = -oi->GetRightDriveY();
     inputRightX = -oi->GetRightDriveX();
 
+
     elevator_up_key_pressed = oi->GetDriveRightTrigger();
     elevator_down_key_pressed = oi->GetDriveLeftTrigger();
     servo_left_pressed = oi->GetDriveLeftBumper();
     servo_right_pressed = oi->GetDriveRightBumper();
+
+    pov_position = oi->GetDrivePOV();
+
     
     double vx = 0;
     double vy = 0;
@@ -83,10 +87,10 @@ void Drive::Execute()
 
     //code for OMS
     if (elevator_up_key_pressed ){
-        oms->elevator_move_height(constant::ELEVATOR_MOVE_SPEED);
+        oms->elevator_move_height(constant::ELEVATOR_MOVE_SPEED, true);
     }
     else if (elevator_down_key_pressed ){
-        oms->elevator_move_height(-constant::ELEVATOR_MOVE_SPEED);
+        oms->elevator_move_height(-constant::ELEVATOR_MOVE_SPEED, true);
     }
     if (servo_left_pressed ){
         oms->MoveGripper(constant::GRIPPER_MOVEMENT_SPEED);
@@ -94,6 +98,14 @@ void Drive::Execute()
     else if (servo_right_pressed ){
         oms->MoveGripper(-constant::GRIPPER_MOVEMENT_SPEED);
     }
+
+    if (pov_position == 0){ // Up
+        oms->elevator_move_height(constant::ELEVATOR_MOVE_SPEED, false);
+    }
+    else if (pov_position == 180){ // Down
+        oms->elevator_move_height(-constant::ELEVATOR_MOVE_SPEED, false);
+    }
+
 
 
 

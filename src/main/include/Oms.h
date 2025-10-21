@@ -16,7 +16,7 @@ class Oms
         Oms( Hardware * h ) : hardware{h}{}
 
         void elevator_set_height( double desired_height, bool async = true );
-        void elevator_move_height( double delta_height , bool async = true );
+        void elevator_move_height( double delta_height , bool fast = false, bool async = true );
         void oms_maintain_height();
         void SetGripper( double angle );
         void MoveGripper(int delta_angle);

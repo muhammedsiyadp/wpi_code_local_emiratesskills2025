@@ -49,5 +49,6 @@ class Drive
         bool elevator_down_key_pressed = false;
         bool servo_left_pressed = false;
         bool servo_right_pressed = false;
+        int pov_position = -1;
 
 };
