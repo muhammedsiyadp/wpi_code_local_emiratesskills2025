@@ -1,12 +1,3 @@
-/************************************
- * Author: Felipe Ferreira
- * Release version: 1.0.0.0
- * 
- * Modified by: 
- * Last modification date: 
- * New version:
-
-*************************************/
 
 #include "ManualDrive.h"
 
@@ -78,9 +69,16 @@ void Drive::Execute()
 
     move->InverseKinematics(vx, vy, vth);       // Based on the desired vx, vy and vth calculates the PWM to be applied to each wheel
 
+    if (!hardware->GetStopButton()){  // Stop the Motors when the Stop Button is pressed
+        hardware->SetLeft ( 0 );
+        hardware->SetBack ( 0 );
+        hardware->SetRight( 0 );
+    }
+    else {
     hardware->SetLeft ( move->desired_left_speed );
     hardware->SetBack ( move->desired_back_speed );
     hardware->SetRight( move->desired_right_speed );
+    }
 
     prev_vx = vx;
     prev_vy = vy;
