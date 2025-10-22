@@ -15,14 +15,25 @@ class Oms
     public:
         Oms( Hardware * h ) : hardware{h}{}
 
-        void oms_driver( double desired_height );
+        void elevator_set_height( double desired_height, bool async = true );
+        void elevator_move_height( double delta_height , bool fast = false, bool async = true );
+        void oms_maintain_height();
         void SetGripper( double angle );
-        void oms_home();
+        void MoveGripper(int delta_angle);
+        void OpenGripper();
+        void CloseGripper();
 
-        double height = -1000;
+        double cur_elevator_height = -1000;
+        int cur_gripper_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
 
     private:
-
+        int gripper_close_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
+        int gripper_open_angle = constant::INITIAL_GRIPPER_OPEN_ANGLE;
+        int elevator_motion_during_gripper = constant::INITIAL_ELEVATOR_MOTION_DURING_GRIPPER;
         Hardware * hardware;
+
+        double elevator_target_height = constant::ELEVATOR_LIMIT_HIGH_HEIGHT;
+        bool elevator_on_target = false;
+        bool gripper_closed = false;
 
 };

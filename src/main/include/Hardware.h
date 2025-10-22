@@ -18,6 +18,8 @@
 #include "frc/AnalogInput.h"
 #include "frc/Ultrasonic.h"
 
+#include "frc/RobotController.h"
+
 #include "studica/TitanQuad.h"
 #include "studica/TitanQuadEncoder.h"
 #include "studica/Servo.h"
@@ -68,6 +70,8 @@ class Hardware
 
         void SetGripper( double angle );
 
+        double GetBatteryVoltage();
+
 
 
     private:
@@ -99,6 +103,9 @@ class Hardware
 
         frc::DigitalOutput runningLED{constant::RUNNING_LED};
         frc::DigitalOutput stoppedLED{constant::STOPPED_LED};
+
+        frc::RobotController robotController{};
+        
 
         studica::Cobra cobra{};
 

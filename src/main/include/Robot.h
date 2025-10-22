@@ -12,6 +12,7 @@
 
 #include <string>
 #include <iostream>
+#include <thread>
 
 #include <frc/TimedRobot.h>
 #include <studica/MockDS.h>
@@ -20,6 +21,7 @@
 #include "Hardware.h"
 #include "Movement.h"
 #include "Oms.h"
+#include "ManualDrive.h"
 
 class Robot : public frc::TimedRobot {
  public:

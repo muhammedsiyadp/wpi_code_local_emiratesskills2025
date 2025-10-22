@@ -154,3 +154,6 @@ bool Hardware::GetLimitLow(){
     //return limit_low.Get();
     return ElevatorMotor.GetLimitSwitch(1);
 }
+double Hardware::GetBatteryVoltage(){
+    return robotController.GetInputVoltage();
+}
