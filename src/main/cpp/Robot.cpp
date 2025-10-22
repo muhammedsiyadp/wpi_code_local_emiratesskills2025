@@ -4,7 +4,7 @@
  * 
  * Modified by: Muhammed siyad p
  * Last modification date: 20-10-2025
- * New version: 1.1.0.0
+ * New version: 1.2.0.0
 
 *************************************/
 
