@@ -59,6 +59,7 @@ namespace constant
     // Gripper 
     static constexpr double INITIAL_GRIPPER_CLOSE_ANGLE = 90.0;
     static constexpr double INITIAL_GRIPPER_OPEN_ANGLE =  0.0;
+    static constexpr double INITIAL_ELEVATOR_MOTION_DURING_GRIPPER = 2.0; // [cm]
     static constexpr double GRIPPER_MOVEMENT_SPEED = 5.0; // degrees per button press
 
 

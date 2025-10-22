@@ -22,7 +22,6 @@ void Oms::oms_maintain_height(){
     double delta_time = 0.2; // [s]
     double current_enc  = hardware->GetElevatorEncoder();
     double previous_enc = hardware->GetElevatorEncoder();
-
     while(true) {
 
         current_enc = hardware->GetElevatorEncoder();
@@ -62,10 +61,9 @@ void Oms::oms_maintain_height(){
 
         frc::SmartDashboard::PutNumber("cur_elevator_height",  cur_elevator_height );
         frc::SmartDashboard::PutNumber("Battery Voltage",  hardware->GetBatteryVoltage() );
-        frc::SmartDashboard::PutNumber("Gripper closed angle", gripper_close_angle );
-        frc::SmartDashboard::PutNumber("Gripper opened angle", gripper_open_angle );
         gripper_close_angle = frc::SmartDashboard::GetNumber("Gripper closed angle", gripper_close_angle );
         gripper_open_angle = frc::SmartDashboard::GetNumber("Gripper opened angle", gripper_open_angle );
+        elevator_motion_during_gripper = frc::SmartDashboard::PutNumber("Elevator motion during gripper", elevator_motion_during_gripper);
 
 
         delay( delta_time * 1000 );
@@ -79,18 +77,28 @@ void Oms::SetGripper( double angle ){
     cur_gripper_angle = angle;
     std::clamp( cur_gripper_angle, 0, 300 );
     frc::SmartDashboard::PutNumber("Servo Pos", cur_gripper_angle );
+    frc::SmartDashboard::PutNumber("Gripper closed angle", gripper_close_angle );
+    frc::SmartDashboard::PutNumber("Gripper opened angle", gripper_open_angle );
+    frc::SmartDashboard::PutNumber("Elevator motion during gripper", elevator_motion_during_gripper);
     hardware->SetGripper( cur_gripper_angle );
 }
 void Oms::MoveGripper(int delta_angle){
     cur_gripper_angle += delta_angle;
     cur_gripper_angle = std::clamp( cur_gripper_angle, 0, 300 );
     frc::SmartDashboard::PutNumber("Servo Pos", cur_gripper_angle );
+    frc::SmartDashboard::PutNumber("Gripper closed angle", gripper_close_angle );
+    frc::SmartDashboard::PutNumber("Gripper opened angle", gripper_open_angle );
+    frc::SmartDashboard::PutNumber("Elevator motion during gripper", elevator_motion_during_gripper);
     hardware->SetGripper( cur_gripper_angle );
 }
 void Oms::CloseGripper(){
+    if (!gripper_closed) elevator_move_height(elevator_motion_during_gripper);
+    gripper_closed = true;
     SetGripper( gripper_close_angle );
 }
 void Oms::OpenGripper(){
+    if (gripper_closed) elevator_move_height(-elevator_motion_during_gripper);
+    gripper_closed = false;
     SetGripper( gripper_open_angle );
 }
 
