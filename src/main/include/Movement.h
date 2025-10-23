@@ -28,12 +28,15 @@ class Movement
         void InverseKinematics(double x, double y, double z);
         void ForwardKinematics( double vl, double vr, double vb );
         void SetPosition( double x, double y, double th );
+        void SetYaw( double th );
         
         void PositionDriver( double desired_x, double desired_y, double desired_th );
        void DriveStraight(double distance_cm);
        void SideWalk(double distance_cm);
 
         void CorrectHeadingUsingFrontSensors();
+
+        void BackgroundTasks();
 
 
 

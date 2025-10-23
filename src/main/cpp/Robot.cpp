@@ -23,7 +23,7 @@ int main() {
     Drive drive( &hard, &move, &oi, &oms );
 
     std::thread oms_thread(&Oms::oms_maintain_height, &oms); // Start the elevator maintain height in a separate thread (background)
-
+    std::thread movement_thread(&Movement::BackgroundTasks, &move); // Start the movement background tasks in a separate thread
     delay(1000);
 
 hard.SetRunningLED(false);
@@ -36,6 +36,7 @@ while(1){
      while( hard.GetStartButton() ){ move.ShuffleBoardUpdate();delay(150); }
 
     //  hard.SetRunningLED(true);
+    
     //  hard.SetStoppedLED(false);
 
     //  move.SetPosition( 0, 0, 0 ); 

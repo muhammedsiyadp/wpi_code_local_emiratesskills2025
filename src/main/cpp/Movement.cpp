@@ -10,17 +10,14 @@
 
 #include "Movement.h"
 
-void Movement::PositionDriver( double desired_x, double desired_y, double desired_th ) {
-
-    double delta_time = 0.2; // [s]
-
-    delay(100);
-
+// All the backgroud tasks related to movement will be defined here
+// this include maintain yaw heading, update encoders, global coordinates and more.
+void Movement::BackgroundTasks() {
     previous_enc_l = hardware->GetLeftEncoder();
     previous_enc_r = hardware->GetRightEncoder();
     previous_enc_b = hardware->GetBackEncoder();
 
-    do{
+    while (true) {
 
         current_enc_l = hardware->GetLeftEncoder();
         double delta_enc_l = current_enc_l - previous_enc_l;
@@ -54,6 +51,33 @@ void Movement::PositionDriver( double desired_x, double desired_y, double desire
         // th_global = th_global + ((delta_th / M_PI) * 180); 
 
         th_global = -hardware->GetYaw() - offset_th;            // Angle based on the Gyro
+
+        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
+            hardware->SetLeft ( 0 );
+            hardware->SetBack ( 0 );
+            hardware->SetRight( 0 );
+            // break;
+        }else{
+            hardware->SetLeft ( desired_left_speed );
+            hardware->SetBack ( desired_back_speed );
+            hardware->SetRight( desired_right_speed );
+        }
+    }
+    ShuffleBoardUpdate();
+
+}
+
+void Movement::PositionDriver( double desired_x, double desired_y, double desired_th ) {
+
+    double delta_time = 0.2; // [s]
+
+    delay(100);
+
+    
+
+    do{
+
+        
 
         if      ( th_global <  0  ) { th_global = th_global + 360; }
         else if ( th_global > 360 ) { th_global = th_global - 360; } 
@@ -94,18 +118,9 @@ void Movement::PositionDriver( double desired_x, double desired_y, double desire
         InverseKinematics( desired_vx, desired_vy, desired_vth );
 
 
-        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
-            hardware->SetLeft ( 0 );
-            hardware->SetBack ( 0 );
-            hardware->SetRight( 0 );
-            // break;
-        }else{
-            hardware->SetLeft ( desired_left_speed );
-            hardware->SetBack ( desired_back_speed );
-            hardware->SetRight( desired_right_speed );
-        }
+        
 
-        ShuffleBoardUpdate();
+        
       
         delay( delta_time * 1000 ); 
 
@@ -161,6 +176,11 @@ double Movement::WheelSpeed( int encoder, double time ){
 void Movement::SetPosition( double x, double y, double th ){
     x_global  = x;
     y_global  = y;
+    offset_th = -hardware->GetYaw() - th;
+    th_global = th;
+}
+
+void Movement::SetYaw( double th ){
     offset_th = -hardware->GetYaw() - th;
     th_global = th;
 }
