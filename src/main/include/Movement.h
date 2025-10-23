@@ -28,15 +28,18 @@ class Movement
         void InverseKinematics(double x, double y, double z);
         void ForwardKinematics( double vl, double vr, double vb );
         void SetPosition( double x, double y, double th );
-        void SetYaw( double th );
         
         void PositionDriver( double desired_x, double desired_y, double desired_th );
-       void DriveStraight(double distance_cm);
-       void SideWalk(double distance_cm);
+        void RotateToAngle( double desired_angle );
+        void Rotate( double angle_deg );
+        void DriveStraight(double distance_cm);
+        void SideWalk(double distance_cm);
 
         void CorrectHeadingUsingFrontSensors();
 
         void BackgroundTasks();
+        void SetHeading(double th);
+        void ReleaseHeading();
 
 
 
@@ -52,7 +55,16 @@ class Movement
         double desired_back_speed; 
         double desired_left_speed; 
         double desired_right_speed;
-        double servo_current_angle = 90;
+
+        
+        bool maintain_heading_enabled = true;
+        bool heading_on_target = false;
+        
+        double desired_vx;
+        double desired_vy;
+        double desired_vth;
+        double desired_th;
+
 
     private:
 
@@ -81,9 +93,6 @@ class Movement
         double rightVelocity;
         double backVelocity; 
 
-        double desired_vx;
-        double desired_vy;
-        double desired_vth;
 
         double vx;
         double vy; 

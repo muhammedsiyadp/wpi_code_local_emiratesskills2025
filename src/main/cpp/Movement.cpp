@@ -13,9 +13,12 @@
 // All the backgroud tasks related to movement will be defined here
 // this include maintain yaw heading, update encoders, global coordinates and more.
 void Movement::BackgroundTasks() {
+    double delta_time = 0.2; // [s]
+
     previous_enc_l = hardware->GetLeftEncoder();
     previous_enc_r = hardware->GetRightEncoder();
     previous_enc_b = hardware->GetBackEncoder();
+    delay(100);
 
     while (true) {
 
@@ -52,6 +55,30 @@ void Movement::BackgroundTasks() {
 
         th_global = -hardware->GetYaw() - offset_th;            // Angle based on the Gyro
 
+        if      ( th_global <  0  ) { th_global = th_global + 360; }
+        else if ( th_global > 360 ) { th_global = th_global - 360; } 
+
+
+        //code to maintain heading
+        if (maintain_heading_enabled) {
+            double th_diff = desired_th - th_global;
+            if      ( th_diff < -180 ) { th_diff = th_diff + 360; }
+            else if ( th_diff >  180 ) { th_diff = th_diff - 360; }
+            desired_vth = (th_diff / 10.0) * max_ang_speed;  // [rad/s]
+            if     ( desired_vth >  max_ang_speed ){ desired_vth =  max_ang_speed; }
+            else if( desired_vth < -max_ang_speed ){ desired_vth = -max_ang_speed; }
+            if( abs(th_diff) < angular_tolerance ){ 
+                desired_vth = 0;
+                heading_on_target = true;
+            }
+            else {
+                heading_on_target = false;
+            }
+
+        }
+
+        InverseKinematics( desired_vx, desired_vy, desired_vth );
+
         if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
             hardware->SetLeft ( 0 );
             hardware->SetBack ( 0 );
@@ -62,77 +89,71 @@ void Movement::BackgroundTasks() {
             hardware->SetBack ( desired_back_speed );
             hardware->SetRight( desired_right_speed );
         }
+        ShuffleBoardUpdate();
+        delay( delta_time * 1000 ); 
     }
-    ShuffleBoardUpdate();
-
 }
 
-void Movement::PositionDriver( double desired_x, double desired_y, double desired_th ) {
-
-    double delta_time = 0.2; // [s]
-
-    delay(100);
-
-    
-
+void Movement::PositionDriver( double desired_x, double desired_y, double temp_desired_th ) {
+    double temp_th_diff ;
     do{
 
-        
-
-        if      ( th_global <  0  ) { th_global = th_global + 360; }
-        else if ( th_global > 360 ) { th_global = th_global - 360; } 
-
-        double desired_position[3] = { desired_x, desired_y, desired_th };   // [cm], [cm], [degrees]
+        double desired_position[3] = { desired_x, desired_y, temp_desired_th };   // [cm], [cm], [degrees]
         double current_position[3] = { x_global , y_global, th_global };     // [cm], [cm], [degrees]
 
         double x_diff  = desired_position[0] - current_position[0];
         double y_diff  = desired_position[1] - current_position[1];
-        double th_diff = desired_position[2] - current_position[2];
-
-        if      ( th_diff < -180 ) { th_diff = th_diff + 360; }
-        else if ( th_diff >  180 ) { th_diff = th_diff - 360; }
-
-        frc::SmartDashboard::PutNumber("th_diff", th_diff);
                                 
 
+        double temp_desired_vx = (x_diff / 10.0) * max_linear_speed; // [cm/s]
+        if     ( temp_desired_vx >  max_linear_speed ){ temp_desired_vx =  max_linear_speed; }
+        else if( temp_desired_vx < -max_linear_speed ){ temp_desired_vx = -max_linear_speed; }
+        desired_vx = temp_desired_vx;
 
-        desired_vx = (x_diff / 10.0) * max_linear_speed; // [cm/s]
-        if     ( desired_vx >  max_linear_speed ){ desired_vx =  max_linear_speed; }
-        else if( desired_vx < -max_linear_speed ){ desired_vx = -max_linear_speed; }
+        double temp_desired_vy = (y_diff / 10.0) * max_linear_speed; // [cm/s]
+        if     ( temp_desired_vy >  max_linear_speed ){ temp_desired_vy =  max_linear_speed; }
+        else if( temp_desired_vy < -max_linear_speed ){ temp_desired_vy = -max_linear_speed; }
+        desired_vy = temp_desired_vy;
+        desired_th = temp_desired_th;
 
-        desired_vy = (y_diff / 10.0) * max_linear_speed; // [cm/s]
-        if     ( desired_vy >  max_linear_speed ){ desired_vy =  max_linear_speed; }
-        else if( desired_vy < -max_linear_speed ){ desired_vy = -max_linear_speed; }
-
-        desired_vth = (th_diff / 10.0) * max_ang_speed;  // [rad/s]
-        if     ( desired_vth >  max_ang_speed ){ desired_vth =  max_ang_speed; }
-        else if( desired_vth < -max_ang_speed ){ desired_vth = -max_ang_speed; }
+        
 
 
         if( abs(x_diff) < linear_tolerance )  { desired_vx = 0;  }
         if( abs(y_diff) < linear_tolerance )  { desired_vy = 0;  }
-        if( abs(th_diff) < angular_tolerance ){ desired_vth = 0; }
 
+    }while( desired_vx != 0 || desired_vy != 0 || !heading_on_target );
 
-        //Inverse Kinematics
-        InverseKinematics( desired_vx, desired_vy, desired_vth );
-
-
-        
-
-        
-      
-        delay( delta_time * 1000 ); 
-
-    }while( desired_vx != 0 || desired_vy != 0 || desired_vth != 0 );
-
-    hardware->SetLeft ( 0 );
-    hardware->SetBack ( 0 );
-    hardware->SetRight( 0 );
+    desired_vx = 0;
+    desired_vy = 0;
+    desired_vth = 0;
+    desired_left_speed  = 0;
+    desired_right_speed = 0;
+    desired_back_speed  = 0;
 
     delay(250);
 }
 
+void Movement::RotateToAngle( double desired_angle ){
+    maintain_heading_enabled = true;
+    desired_th = desired_angle;
+    do{
+        delay(200);
+
+    }while(!heading_on_target);
+
+    desired_vth = 0;
+    desired_left_speed  = 0;
+    desired_right_speed = 0;
+    desired_back_speed  = 0;
+    delay(250);
+}
+void Movement::Rotate( double angle_deg ){
+    double target_angle = th_global + angle_deg;
+    if      ( target_angle <  0  ) { target_angle = target_angle + 360; }
+    else if ( target_angle > 360 ) { target_angle = target_angle - 360; } 
+    RotateToAngle( target_angle );
+}
 void Movement::InverseKinematics(double x, double y, double z){
 
     double th_radius = th_global * ( M_PI / 180.0 );
@@ -176,13 +197,19 @@ double Movement::WheelSpeed( int encoder, double time ){
 void Movement::SetPosition( double x, double y, double th ){
     x_global  = x;
     y_global  = y;
-    offset_th = -hardware->GetYaw() - th;
-    th_global = th;
+    SetHeading( th );
 }
 
-void Movement::SetYaw( double th ){
+void Movement::SetHeading( double th ){
     offset_th = -hardware->GetYaw() - th;
     th_global = th;
+    desired_th = th;
+    maintain_heading_enabled = true;
+
+}
+void Movement::ReleaseHeading(){
+    desired_vth = 0;
+    maintain_heading_enabled = false;
 }
 
 void Movement::ShuffleBoardUpdate(){
@@ -200,10 +227,6 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("vth", vth);
 
     frc::SmartDashboard::PutBoolean("Stop Button",  hardware->GetStopButton() );
-
-    frc::SmartDashboard::PutNumber("leftVelocity",  leftVelocity  );
-    frc::SmartDashboard::PutNumber("rightVelocity", rightVelocity );
-    frc::SmartDashboard::PutNumber("backVelocity",  backVelocity  );
 
     frc::SmartDashboard::PutNumber("desired_vx",  desired_vx );
     frc::SmartDashboard::PutNumber("desired_vy",  desired_vy );
@@ -225,11 +248,7 @@ void Movement::ShuffleBoardUpdate(){
 
     frc::SmartDashboard::PutNumber("Limit High",  hardware->GetLimitHigh() );
     frc::SmartDashboard::PutNumber("Limit Low",  hardware->GetLimitLow() );
-    frc::SmartDashboard::PutNumber("Heading",  1);//hardware->GetYaw() );
-    servo_current_angle = frc::SmartDashboard::GetNumber("servo_angle",90);
-    
-
-    
+    frc::SmartDashboard::PutNumber("desired th",  desired_th );
 
 }
 
@@ -249,7 +268,6 @@ void Movement::sensor_drive( double dist, std::string direction ){
 
         if      ( direction.compare( "front" ) == 0 ){
             sensor_reading = hardware->getFrontDistance_R();
-            frc::SmartDashboard::PutNumber("sensor_reading", sensor_reading ); 
 
             if( sensor_reading > dist ){
                 InverseKinematics(  20, 0, 0 );
@@ -258,7 +276,6 @@ void Movement::sensor_drive( double dist, std::string direction ){
             }
         }else if( direction.compare( "left" ) == 0 ){
             sensor_reading = hardware->getLeftDistance();
-            frc::SmartDashboard::PutNumber("sensor_reading", sensor_reading ); 
 
             if( sensor_reading > dist ){
                 InverseKinematics( 0,  20, 0 );
@@ -267,7 +284,6 @@ void Movement::sensor_drive( double dist, std::string direction ){
             }
         }else if( direction.compare( "right" ) == 0 ){
             sensor_reading = hardware->getRightDistance();
-            frc::SmartDashboard::PutNumber("sensor_reading", sensor_reading ); 
 
             if( sensor_reading > dist ){
                 InverseKinematics( 0, -20, 0 );
@@ -317,10 +333,6 @@ void Movement::line_align( std::string direction ){
         cobra_cl = hardware->GetCobra(1) > 2.5;
         cobra_cr = hardware->GetCobra(2) > 2.5;
 
-        frc::SmartDashboard::PutNumber("cobra_0", hardware->GetCobra(0) );
-        frc::SmartDashboard::PutNumber("cobra_1", hardware->GetCobra(1) );
-        frc::SmartDashboard::PutNumber("cobra_2", hardware->GetCobra(2) );
-        frc::SmartDashboard::PutNumber("cobra_3", hardware->GetCobra(3) ); 
 
         if      ( direction.compare( "left" ) == 0){
             InverseKinematics( 0,  20, 0 );  
@@ -389,9 +401,6 @@ void Movement::CorrectHeadingUsingFrontSensors() {
     double diff = left - right;
 
     // Log values
-    frc::SmartDashboard::PutNumber("Front_Left_IR", left);
-    frc::SmartDashboard::PutNumber("Front_Right_IR", right);
-    frc::SmartDashboard::PutNumber("Front_IR_Diff", diff);
 
     if (fabs(diff) > 0.5) {
         double correction_speed = 0.2;  // tune this value
