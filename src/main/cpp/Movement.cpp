@@ -13,7 +13,7 @@
 // All the backgroud tasks related to movement will be defined here
 // this include maintain yaw heading, update encoders, global coordinates and more.
 void Movement::BackgroundTasks() {
-    double delta_time = 0.2; // [s]
+    double delta_time = 0.1; // [s]
 
     previous_enc_l = hardware->GetLeftEncoder();
     previous_enc_r = hardware->GetRightEncoder();
@@ -121,6 +121,7 @@ void Movement::PositionDriver( double desired_x, double desired_y, double temp_d
 
         if( abs(x_diff) < linear_tolerance )  { desired_vx = 0;  }
         if( abs(y_diff) < linear_tolerance )  { desired_vy = 0;  }
+        delay(200);
 
     }while( desired_vx != 0 || desired_vy != 0 || !heading_on_target );
 

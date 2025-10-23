@@ -33,7 +33,7 @@ while(1){
     // Wait until the Start Button is pressed
         
         //delay(50);
-     while( hard.GetStartButton() ){ move.ShuffleBoardUpdate();delay(150); }
+     while( hard.GetStartButton() ){delay(150); }
 
     //  hard.SetRunningLED(true);
     
