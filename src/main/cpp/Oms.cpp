@@ -1,7 +1,7 @@
 #include "Oms.h"
 
 void Oms::elevator_set_height( double desired_height , bool async ){
-    desired_height = std::clamp( desired_height, (double)constant::ELEVATOR_LIMIT_LOW_HEIGHT, (double)constant::ELEVATOR_LIMIT_HIGH_HEIGHT );
+    //desired_height = std::clamp( desired_height, (double)constant::ELEVATOR_LIMIT_LOW_HEIGHT, (double)constant::ELEVATOR_LIMIT_HIGH_HEIGHT );
     elevator_target_height = desired_height;
     elevator_on_target = false;
     if (!async)
@@ -53,7 +53,7 @@ void Oms::oms_maintain_height(){
         }
 
 
-        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
+        if ( (!hardware->GetStopButton()) || (!hardware->GetLimitHigh()) ){  // Stop the Motors when the Stop Button is pressed
             hardware->SetElevator ( 0 );
         }else{
             hardware->SetElevator ( desired_v / 70.0 );
