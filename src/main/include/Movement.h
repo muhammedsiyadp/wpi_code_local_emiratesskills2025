@@ -57,13 +57,16 @@ class Movement
         double desired_right_speed;
 
         
-        bool maintain_heading_enabled = true;
+        bool maintain_heading_enabled = false;
         bool heading_on_target = false;
         
         double desired_vx;
         double desired_vy;
         double desired_vth;
         double desired_th;
+
+        bool autonomous_mode = true;
+
 
 
     private:

@@ -99,7 +99,7 @@ class Hardware
         frc::AnalogInput left_sharp{3};
 
         frc::Ultrasonic us_r{15, 11};
-        frc::Ultrasonic us_l{14, 10};
+        frc::Ultrasonic us_l{0, 1};
 
         frc::DigitalOutput runningLED{constant::RUNNING_LED};
         frc::DigitalOutput stoppedLED{constant::STOPPED_LED};

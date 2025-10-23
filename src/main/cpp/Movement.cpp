@@ -77,18 +77,21 @@ void Movement::BackgroundTasks() {
 
         }
 
-        InverseKinematics( desired_vx, desired_vy, desired_vth );
-
-        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
-            hardware->SetLeft ( 0 );
-            hardware->SetBack ( 0 );
-            hardware->SetRight( 0 );
-            // break;
-        }else{
-            hardware->SetLeft ( desired_left_speed );
-            hardware->SetBack ( desired_back_speed );
-            hardware->SetRight( desired_right_speed );
+        
+        if (autonomous_mode){
+            InverseKinematics( desired_vx, desired_vy, desired_vth );
+            if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
+                hardware->SetLeft ( 0 );
+                hardware->SetBack ( 0 );
+                hardware->SetRight( 0 );
+                // break;
+            }else{
+                hardware->SetLeft ( desired_left_speed );
+                hardware->SetBack ( desired_back_speed );
+                hardware->SetRight( desired_right_speed );
+            }
         }
+        
         ShuffleBoardUpdate();
         delay( delta_time * 1000 ); 
     }

@@ -35,15 +35,14 @@ while(1){
         //delay(50);
      while( hard.GetStartButton() ){delay(150); }
 
-    //  hard.SetRunningLED(true);
-    
-    //  hard.SetStoppedLED(false);
+    hard.SetRunningLED(true);
+    hard.SetStoppedLED(false);
 
-    //  move.SetPosition( 0, 0, 0 ); 
+    move.SetPosition( 0, 0, 0 ); 
      
-    // //  move.PositionDriver(100,100,180);
-    // //  delay(1000);
-    // //  move.PositionDriver(0,0,0);
+    move.PositionDriver(100,100,0);
+    delay(1000);
+    move.PositionDriver(0,0,0);
    
     
     // //  move.PositionDriver(80,80,90);move.SetPosition( 0, 0, 0 ); 
@@ -67,6 +66,7 @@ while(1){
 
     //  hard.SetRunningLED(false);
     //  hard.SetStoppedLED(true);
+    move.autonomous_mode = false;
     while (true){
         drive.Execute();
         delay(50);
