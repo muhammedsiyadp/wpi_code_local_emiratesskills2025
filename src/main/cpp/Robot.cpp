@@ -65,7 +65,7 @@ while(1){
 
 
     //pick and come to court centre
-    move.DriveStraight(9);
+    move.DriveStraight(10);
     oms.CloseGripper();
     delay(1000);
     move.DriveStraight(-12);
@@ -81,10 +81,10 @@ while(1){
     move.line_align("left");
 
     //place and go back
-    move.DriveStraight(9);
+    move.DriveStraight(11);
     oms.OpenGripper();
     delay(2000);
-    move.DriveStraight(-11);
+    move.DriveStraight(-13);
     move.PositionDriver(100,100,0);
 
     oms.elevator_set_height(18.5);
@@ -101,13 +101,13 @@ while(1){
     move.line_align("right");
 
      //pick and come to court centre
-    move.DriveStraight(9);
+    move.DriveStraight(10);
     oms.CloseGripper();
     delay(1000);
     move.DriveStraight(-12);
     move.PositionDriver(100,100,0);
 
-    oms.elevator_set_height(19);
+    oms.elevator_set_height(18.5);
 
     //center to stand to first row (right to left)
     move.PositionDriver(160,80,0);
@@ -117,10 +117,10 @@ while(1){
     move.line_align("left");
 
     //place and go back
-    move.DriveStraight(9);
+    move.DriveStraight(11);
     oms.OpenGripper();
     delay(2000);
-    move.DriveStraight(-11);
+    move.DriveStraight(-13);
     move.PositionDriver(100,100,0);
 
 
