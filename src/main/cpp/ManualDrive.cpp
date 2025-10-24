@@ -67,7 +67,8 @@ void Drive::Execute()
     std::clamp( vy,  xy_speed, -xy_speed );
     std::clamp( vth, th_speed, -th_speed );
 
-    move->InverseKinematics(vx, vy, vth);       // Based on the desired vx, vy and vth calculates the PWM to be applied to each wheel
+    
+    move->InverseKinematics_local(vx, vy, vth);       // Based on the desired vx, vy and vth calculates the PWM to be applied to each wheel
 
     if (!hardware->GetStopButton()){  // Stop the Motors when the Stop Button is pressed
         hardware->SetLeft ( 0 );

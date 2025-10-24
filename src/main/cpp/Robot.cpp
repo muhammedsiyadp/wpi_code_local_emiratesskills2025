@@ -24,6 +24,7 @@ int main() {
 
     std::thread oms_thread(&Oms::oms_maintain_height, &oms); // Start the elevator maintain height in a separate thread (background)
     std::thread movement_thread(&Movement::BackgroundTasks, &move); // Start the movement background tasks in a separate thread
+    std::thread sharp_thread(&Hardware::Update_sharp_sensors_background, &hard); // Start the sharp sensors update in a separate thread
     delay(1000);
 
 hard.SetRunningLED(false);
@@ -35,39 +36,104 @@ while(1){
         //delay(50);
      while( hard.GetStartButton() ){delay(150); }
 
+    
+
     hard.SetRunningLED(true);
     hard.SetStoppedLED(false);
 
-    move.SetPosition( 0, 0, 0 ); 
-     
+    //move.line_align("right");
+    
+    
+    //from start to midpoint of court
+    move.SetPosition( 30, 35, 0 ); 
+    oms.OpenGripper();
+    move.PositionDriver(100,35,0);
     move.PositionDriver(100,100,0);
+    
+    //from court midpoint to shelf midpoint
+    move.PositionDriver(53,135,90);
+
+    oms.elevator_set_height(6.7);
+
+    //from shelf midpoint to first column
+    move.PositionDriver(26,162,90);
+    move.sensor_drive(16 , "front_l");
+    move.sensor_drive(52 , "right");
+    move.sensor_drive(16 , "front_l");
+    move.SetPosition(26,162,90);
+    move.line_align("right");
+
+
+    //pick and come to court centre
+    move.DriveStraight(9);
+    oms.CloseGripper();
     delay(1000);
-    move.PositionDriver(0,0,0);
-   
-    
-    // //  move.PositionDriver(80,80,90);move.SetPosition( 0, 0, 0 ); 
-    // //  move.PositionDriver(50,50,0);move.SetPosition( 0, 0, 0 ); 
-    // //  move.PositionDriver(-50,-50,0);move.SetPosition( 0, 0, 0 ); 
-    // //  move.PositionDriver(0,0,-90);move.SetPosition( 0, 0, 0 );
-    // //  move.PositionDriver(70,0,0);move.SetPosition( 0, 0, 0 );
-    // // move.PositionDriver(-80,-80,0);move.SetPosition( 0, 0, 0 );
-    // // move.PositionDriver(-70,0,0);move.SetPosition( 0, 0, 0 );
-    
-        
-    // // move.DriveStraight(100);
-    //  //move.DriveStraight(-50);
-    // // move.SideWalk(100);
-    //  //move.SideWalk(-100);
+    move.DriveStraight(-12);
+    move.PositionDriver(100,100,0);
 
-     
-    // oms.elevator_set_height(20);
-    
-    // oms.SetGripper(move.servo_current_angle);
+    oms.elevator_set_height(12);
 
-    //  hard.SetRunningLED(false);
-    //  hard.SetStoppedLED(true);
-    move.autonomous_mode = false;
-    while (true){
+    //center to stand to first row (right to left)
+    move.PositionDriver(160,80,0);
+    move.sensor_drive(50 , "right");
+    move.sensor_drive(10 , "front_l");
+    move.SetPosition(160,80,0);
+    move.line_align("left");
+
+    //place and go back
+    move.DriveStraight(9);
+    oms.OpenGripper();
+    delay(2000);
+    move.DriveStraight(-11);
+    move.PositionDriver(100,100,0);
+
+    oms.elevator_set_height(18.5);
+
+    //from court midpoint to shelf midpoint
+    move.PositionDriver(53,135,90);
+
+    //from shelf midpoint to first column
+    move.PositionDriver(26,162,90);
+    move.sensor_drive(16 , "front_l");
+    move.sensor_drive(52 , "right");
+    move.sensor_drive(16 , "front_l");
+    move.SetPosition(26,162,90);
+    move.line_align("right");
+
+     //pick and come to court centre
+    move.DriveStraight(9);
+    oms.CloseGripper();
+    delay(1000);
+    move.DriveStraight(-12);
+    move.PositionDriver(100,100,0);
+
+    oms.elevator_set_height(19);
+
+    //center to stand to first row (right to left)
+    move.PositionDriver(160,80,0);
+    move.sensor_drive(50 , "right");
+    move.sensor_drive(10 , "front_l");
+    move.SetPosition(160,80,0);
+    move.line_align("left");
+
+    //place and go back
+    move.DriveStraight(9);
+    oms.OpenGripper();
+    delay(2000);
+    move.DriveStraight(-11);
+    move.PositionDriver(100,100,0);
+
+
+
+
+    
+
+
+    delay(3000);
+
+    
+    while (false){
+        move.autonomous_mode = false;
         drive.Execute();
         delay(50);
     }

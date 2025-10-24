@@ -112,37 +112,36 @@ double Hardware::getLeftDistance( ){
     return us_l.GetRangeMM() / 10.0;
 }
 
-double Hardware::getFrontDistance_R( ){
+double Hardware::getFrontDistance_R_Raw( ){
     return (pow(right_sharp.GetAverageVoltage(), -1.2045)) * 27.726;
 }
 
-double Hardware::getFrontDistance_L( ){
+double Hardware::getFrontDistance_L_Raw( ){
     return (pow(left_sharp.GetAverageVoltage(), -1.2045)) * 27.726;
 }
+void Hardware::Update_sharp_sensors_background(){
+    while (true){
 
-double Hardware::getFilteredFrontDistance_L() {
-    double sum = 0;
-    for (int i = 0; i < 5; i++) {
-        sum += (pow(left_sharp.GetAverageVoltage(), -1.2045)) * 27.726;
-        delay(10); // small delay between readings
+        // we are using a simple low-pass filter to smooth the readings using exponential moving average
+        double alpha = 0.2;
+        double raw_L = getFrontDistance_L_Raw();
+        double raw_R = getFrontDistance_R_Raw();
+
+        filtered_sharp_sensor_L = alpha * raw_L + (1 - alpha) * filtered_sharp_sensor_L;
+        filtered_sharp_sensor_R = alpha * raw_R + (1 - alpha) * filtered_sharp_sensor_R;
+        delay(50);
     }
-    return sum / 5.0;
+}
+double Hardware::getFrontDistance_L(){
+    return filtered_sharp_sensor_L;
+}
+double Hardware::getFrontDistance_R(){
+    return filtered_sharp_sensor_R;
 }
 
-double Hardware::getFilteredFrontDistance_R() {
-    double sum = 0;
-    for (int i = 0; i < 5; i++) {
-        sum += (pow(right_sharp.GetAverageVoltage(), -1.2045)) * 27.726;
-        delay(10);
-    }
-    return sum / 5.0;
-}
 
-double Hardware::getFrontAverageDistance() {
-    double left = getFilteredFrontDistance_L();
-    double right = getFilteredFrontDistance_R();
-    return (left + right) / 2.0;
-}
+
+
 
 
 bool Hardware::GetLimitHigh(){

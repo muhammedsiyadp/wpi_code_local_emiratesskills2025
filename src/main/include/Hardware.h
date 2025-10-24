@@ -57,13 +57,17 @@ class Hardware
 
         double getRightDistance( );
         double getLeftDistance( );
-        double getFrontDistance_R( );
+        double getFrontDistance_L_Raw( );
+        double getFrontDistance_R_Raw( );
         double getFrontDistance_L( );
+        double getFrontDistance_R( );
+
+        void Update_sharp_sensors_background();
+
 
         double getFilteredFrontDistance_L();
         double getFilteredFrontDistance_R();
 
-        double getFrontAverageDistance();
 
         bool GetLimitHigh();
         bool GetLimitLow();
@@ -71,6 +75,9 @@ class Hardware
         void SetGripper( double angle );
 
         double GetBatteryVoltage();
+
+        double filtered_sharp_sensor_L = 0.0;
+        double filtered_sharp_sensor_R = 0.0;
 
 
 

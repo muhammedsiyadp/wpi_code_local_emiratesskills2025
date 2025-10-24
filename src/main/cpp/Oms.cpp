@@ -42,7 +42,7 @@ void Oms::oms_maintain_height(){
         double elev_diff = elevator_target_height - cur_elevator_height;
 
         double max_linear_speed = constant::ELEVATOR_MAX_SPEED; // cm/s
-
+        elev_diff = std::clamp(elev_diff,-35.0,35.0);
         double desired_v = (elev_diff / 5.0) * max_linear_speed; // [cm/s]
         if     ( desired_v >  max_linear_speed ){ desired_v =  max_linear_speed; }
         else if( desired_v < -max_linear_speed ){ desired_v = -max_linear_speed; }
@@ -56,7 +56,8 @@ void Oms::oms_maintain_height(){
         if ( (!hardware->GetStopButton())){// || (!hardware->GetLimitHigh()) ){  // Stop the Motors when the Stop Button is pressed
             hardware->SetElevator ( 0 );
         }else{
-            hardware->SetElevator ( desired_v / 70.0 );
+            hardware->SetElevator ( std::clamp(  (desired_v / 70.0),-0.6,0.6) );
+            
         }
 
         frc::SmartDashboard::PutNumber("cur_elevator_height",  cur_elevator_height );

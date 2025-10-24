@@ -13,12 +13,13 @@
 // All the backgroud tasks related to movement will be defined here
 // this include maintain yaw heading, update encoders, global coordinates and more.
 void Movement::BackgroundTasks() {
-    double delta_time = 0.1; // [s]
+    double delta_time = 0.05; // [s]
 
     previous_enc_l = hardware->GetLeftEncoder();
     previous_enc_r = hardware->GetRightEncoder();
     previous_enc_b = hardware->GetBackEncoder();
     delay(100);
+    int shuffle_board_update_counter = 0; 
 
     while (true) {
 
@@ -79,7 +80,7 @@ void Movement::BackgroundTasks() {
 
         
         if (autonomous_mode){
-            InverseKinematics( desired_vx, desired_vy, desired_vth );
+            InverseKinematics_local( desired_vx_local, desired_vy_local, desired_vth );
             if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
                 hardware->SetLeft ( 0 );
                 hardware->SetBack ( 0 );
@@ -92,12 +93,17 @@ void Movement::BackgroundTasks() {
             }
         }
         
-        ShuffleBoardUpdate();
+        shuffle_board_update_counter ++;
+        if (shuffle_board_update_counter >= 3){
+            ShuffleBoardUpdate();
+            shuffle_board_update_counter = 0;
+        }
         delay( delta_time * 1000 ); 
     }
 }
-
 void Movement::PositionDriver( double desired_x, double desired_y, double temp_desired_th ) {
+    frc::SmartDashboard::PutString("Process",  "Position Driver" );
+    maintain_heading_enabled = true;
     double temp_th_diff ;
     do{
 
@@ -111,34 +117,36 @@ void Movement::PositionDriver( double desired_x, double desired_y, double temp_d
         double temp_desired_vx = (x_diff / 10.0) * max_linear_speed; // [cm/s]
         if     ( temp_desired_vx >  max_linear_speed ){ temp_desired_vx =  max_linear_speed; }
         else if( temp_desired_vx < -max_linear_speed ){ temp_desired_vx = -max_linear_speed; }
-        desired_vx = temp_desired_vx;
+        desired_vx_global = temp_desired_vx;
 
         double temp_desired_vy = (y_diff / 10.0) * max_linear_speed; // [cm/s]
         if     ( temp_desired_vy >  max_linear_speed ){ temp_desired_vy =  max_linear_speed; }
         else if( temp_desired_vy < -max_linear_speed ){ temp_desired_vy = -max_linear_speed; }
-        desired_vy = temp_desired_vy;
+        desired_vy_global = temp_desired_vy;
         desired_th = temp_desired_th;
 
         
 
 
-        if( abs(x_diff) < linear_tolerance )  { desired_vx = 0;  }
-        if( abs(y_diff) < linear_tolerance )  { desired_vy = 0;  }
+        if( abs(x_diff) < linear_tolerance )  { desired_vx_global = 0;  }
+        if( abs(y_diff) < linear_tolerance )  { desired_vy_global = 0;  }
+        global_to_local( desired_vx_global, desired_vy_global );
         delay(200);
 
-    }while( desired_vx != 0 || desired_vy != 0 || !heading_on_target );
+    }while( desired_vx_global != 0 || desired_vy_global != 0 || !heading_on_target );
 
-    desired_vx = 0;
-    desired_vy = 0;
+    desired_vx_global = 0;
+    desired_vy_global = 0;
     desired_vth = 0;
     desired_left_speed  = 0;
     desired_right_speed = 0;
     desired_back_speed  = 0;
+    frc::SmartDashboard::PutString("Process",  "Done" );
 
     delay(250);
 }
-
 void Movement::RotateToAngle( double desired_angle ){
+    frc::SmartDashboard::PutString("Process",  "Rotate To Angle" );
     maintain_heading_enabled = true;
     desired_th = desired_angle;
     do{
@@ -150,21 +158,18 @@ void Movement::RotateToAngle( double desired_angle ){
     desired_left_speed  = 0;
     desired_right_speed = 0;
     desired_back_speed  = 0;
+    frc::SmartDashboard::PutString("Process",  "Done" );
     delay(250);
 }
 void Movement::Rotate( double angle_deg ){
+    frc::SmartDashboard::PutString("Process",  "Rotate By Angle" );
     double target_angle = th_global + angle_deg;
     if      ( target_angle <  0  ) { target_angle = target_angle + 360; }
     else if ( target_angle > 360 ) { target_angle = target_angle - 360; } 
     RotateToAngle( target_angle );
+    frc::SmartDashboard::PutString("Process",  "Done" );
 }
-void Movement::InverseKinematics(double x, double y, double z){
-
-    double th_radius = th_global * ( M_PI / 180.0 );
-
-    // From Global to Local
-    double x_l = x * cos( -th_radius ) - y * sin( -th_radius );
-    double y_l = x * sin( -th_radius ) + y * cos( -th_radius );
+void Movement::InverseKinematics_local(double x_l, double y_l, double z){
     
     desired_back_speed  = (( x_l * cos( M_PI*( 90.0/180.0))) + ( -y_l * sin(M_PI*( 90.0/180.0))) + (z * constant::FRAME_RADIUS) );
     desired_left_speed  = (( x_l * cos( M_PI*(210.0/180.0))) + ( -y_l * sin(M_PI*(210.0/180.0))) + (z * constant::FRAME_RADIUS) );
@@ -175,7 +180,15 @@ void Movement::InverseKinematics(double x, double y, double z){
     desired_right_speed = -desired_right_speed / 55.0;   // cm/s to PWM [0-1]
    
 }
+void Movement::global_to_local(double x_global , double y_global){
 
+    double th_radius = th_global * ( M_PI / 180.0 );
+
+    // From Global to Local
+    desired_vx_local = x_global * cos( -th_radius ) - y_global * sin( -th_radius );
+    desired_vy_local = x_global * sin( -th_radius ) + y_global * cos( -th_radius );
+
+}
 void Movement::ForwardKinematics( double vl, double vr, double vb ){
     
     double vx_l   = ( (      0     * vb ) + ( (1.0/sqrt(3.0)) * vr) + ( (-1.0/sqrt(3.0)) * vl) );   // [cm/s]
@@ -189,7 +202,6 @@ void Movement::ForwardKinematics( double vl, double vr, double vb ){
     vy = vx_l * sin( th_radius ) + vy_l * cos( th_radius );
     vth = vth_l;
 }
-
 double Movement::WheelSpeed( int encoder, double time ){
         double speed  = -1 * (((2 * M_PI * constant::WHEEL_RADIUS * encoder) / (constant::PULSE_PER_REV * time)));   // [cm/s]
 
@@ -197,11 +209,10 @@ double Movement::WheelSpeed( int encoder, double time ){
 
         return speed;
 }
-
-void Movement::SetPosition( double x, double y, double th ){
+void Movement::SetPosition( double x, double y, double th = -1000 ){
     x_global  = x;
     y_global  = y;
-    SetHeading( th );
+    if ( th != -1000 ) SetHeading( th );
 }
 
 void Movement::SetHeading( double th ){
@@ -209,13 +220,11 @@ void Movement::SetHeading( double th ){
     th_global = th;
     desired_th = th;
     maintain_heading_enabled = true;
-
 }
 void Movement::ReleaseHeading(){
     desired_vth = 0;
     maintain_heading_enabled = false;
 }
-
 void Movement::ShuffleBoardUpdate(){
 
     frc::SmartDashboard::PutNumber("desired_back_speed",  desired_back_speed );
@@ -226,14 +235,12 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("robot_y",  y_global );
     frc::SmartDashboard::PutNumber("robot_th", th_global);
 
-    frc::SmartDashboard::PutNumber("vx",  vx );
-    frc::SmartDashboard::PutNumber("vy",  vy );
-    frc::SmartDashboard::PutNumber("vth", vth);
-
     frc::SmartDashboard::PutBoolean("Stop Button",  hardware->GetStopButton() );
 
-    frc::SmartDashboard::PutNumber("desired_vx",  desired_vx );
-    frc::SmartDashboard::PutNumber("desired_vy",  desired_vy );
+    frc::SmartDashboard::PutNumber("desired_vx_local",  desired_vx_local );
+    frc::SmartDashboard::PutNumber("desired_vy_local",  desired_vy_local );
+    frc::SmartDashboard::PutNumber("desired_vx_global",  desired_vx_global );
+    frc::SmartDashboard::PutNumber("desired_vy_global",  desired_vy_global );
     frc::SmartDashboard::PutNumber("desired_vth", desired_vth );
 
     frc::SmartDashboard::PutNumber("Encoder_Left",  hardware->GetLeftEncoder() );
@@ -244,6 +251,8 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("Right Ultrasonic",  hardware->getRightDistance( ) );
     frc::SmartDashboard::PutNumber("Right SharpIR",  hardware->getFrontDistance_R( ) );
     frc::SmartDashboard::PutNumber("Left SharpIR",  hardware->getFrontDistance_L( ) );
+    frc::SmartDashboard::PutNumber("Raw_Right SharpIR",  hardware->getFrontDistance_R_Raw( ) );
+    frc::SmartDashboard::PutNumber("Raw_Left SharpIR",  hardware->getFrontDistance_L_Raw( ) );
 
     frc::SmartDashboard::PutNumber("Left Cobra",  hardware->GetCobra(0) );
     frc::SmartDashboard::PutNumber("Left_c Cobra",  hardware->GetCobra(1) );
@@ -255,71 +264,114 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("desired th",  desired_th );
 
 }
-
 double Movement::get_x() { return x_global;  }
-
 double Movement::get_y() { return y_global;  }
-
 double Movement::get_th(){ return th_global; }
-
-
-
 void Movement::sensor_drive( double dist, std::string direction ){
+    frc::SmartDashboard::PutString("Process",  "Sensor Drive" );
 
     double sensor_reading = 0;
 
-    while( sensor_reading > dist + 2 || sensor_reading < dist - 2 ){
+    while( sensor_reading > dist + 1 || sensor_reading < dist - 1 ){
 
-        if      ( direction.compare( "front" ) == 0 ){
+        if      ( direction.compare( "front_r" ) == 0 ){
             sensor_reading = hardware->getFrontDistance_R();
 
-            if( sensor_reading > dist ){
-                InverseKinematics(  20, 0, 0 );
-            }else{
-                InverseKinematics( -20, 0, 0 );
+            if( sensor_reading > dist + 5 ){
+                desired_vx_local =  20;
+                desired_vy_local =  0;
             }
-        }else if( direction.compare( "left" ) == 0 ){
+            else if( sensor_reading > dist ){
+                desired_vx_local =  10;
+                desired_vy_local =  0;
+            }
+            else if( sensor_reading < dist - 5 ){
+                desired_vx_local = -20;
+                desired_vy_local =  0;
+            }
+            else{
+                desired_vx_local = -10;
+                desired_vy_local =  0;
+            }
+        }
+        else if( direction.compare( "front_l" ) == 0 ){
+            sensor_reading = hardware->getFrontDistance_L();
+
+            if( sensor_reading > dist + 5 ){
+                desired_vx_local =  20;
+                desired_vy_local =  0;
+            }else if( sensor_reading > dist ){
+                desired_vx_local =  10;
+                desired_vy_local =  0;
+            }else if( sensor_reading < dist - 5 ){
+                desired_vx_local = -20;
+                desired_vy_local =  0;
+            }
+            else{
+                desired_vx_local = -10;
+                desired_vy_local =  0;
+            }
+        }
+        else if( direction.compare( "left" ) == 0 ){
             sensor_reading = hardware->getLeftDistance();
 
-            if( sensor_reading > dist ){
-                InverseKinematics( 0,  20, 0 );
-            }else{
-                InverseKinematics( 0, -20, 0 );
+            if( sensor_reading > dist + 5){
+                desired_vx_local =  0;
+                desired_vy_local =  20;
+            }
+            else if ( sensor_reading > dist ){
+                desired_vx_local =  0;
+                desired_vy_local =  10;
+            }
+            else if( sensor_reading < dist - 5 ){
+                desired_vx_local =  0;
+                desired_vy_local = -20;
+            }
+            else{
+                desired_vx_local =  0;
+                desired_vy_local = -10;
             }
         }else if( direction.compare( "right" ) == 0 ){
             sensor_reading = hardware->getRightDistance();
 
-            if( sensor_reading > dist ){
-                InverseKinematics( 0, -20, 0 );
-            }else{
-                InverseKinematics( 0,  20, 0 );
+            if( sensor_reading > dist + 5){
+                desired_vx_local =  0;
+                desired_vy_local = -20;
+            }
+            else if ( sensor_reading > dist ){
+                desired_vx_local =  0;
+                desired_vy_local = -10;
+            }
+            else if( sensor_reading < dist - 5 ){
+                desired_vx_local =  0;
+                desired_vy_local =  20;
+            }
+            else{
+                desired_vx_local =  0;
+                desired_vy_local =  10;
             }
         }
-
-        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
-            hardware->SetLeft ( 0 );
-            hardware->SetBack ( 0 );
-            hardware->SetRight( 0 );
-            // break;
-        }else{
-            hardware->SetLeft ( desired_left_speed );
-            hardware->SetBack ( desired_back_speed );
-            hardware->SetRight( desired_right_speed );
+        else{
+            break;
         }
 
-        ShuffleBoardUpdate();
+        
+
+
 
         delay( 50 );
 
     }
 
-    hardware->SetLeft ( 0 );
-    hardware->SetBack ( 0 );
-    hardware->SetRight( 0 );
+    desired_vx_global = 0;
+    desired_vy_global = 0;
+    desired_vth = 0;
+    desired_vx_local = 0;
+    desired_vy_local = 0;
+    frc::SmartDashboard::PutString("Process",  "Done" );
 
     delay( 150 );
 }
-
 void Movement::line_align( std::string direction ){
 
     frc::SmartDashboard::PutString("Process",  "Cobra Align" );
@@ -339,35 +391,33 @@ void Movement::line_align( std::string direction ){
 
 
         if      ( direction.compare( "left" ) == 0){
-            InverseKinematics( 0,  20, 0 );  
+            desired_vx_local = 0;
+            desired_vy_local = 10;
         }else if( direction.compare( "right" ) == 0 ){
-            InverseKinematics( 0, -20, 0 );  
+            desired_vx_local = 0;
+            desired_vy_local = -10;
         }else{
             break;
         }
 
-        
-        if ( !hardware->GetStopButton() ){  // Stop the Motors when the Stop Button is pressed
-            hardware->SetLeft ( 0 );
-            hardware->SetBack ( 0 );
-            hardware->SetRight( 0 );
-            // break;
-        }else{
-            hardware->SetLeft ( desired_left_speed );
-            hardware->SetBack ( desired_back_speed );
-            hardware->SetRight( desired_right_speed );
-        }
 
         delay(50);
     }
-    hardware->SetLeft ( 0 );
-    hardware->SetBack ( 0 );
-    hardware->SetRight( 0 );
+    desired_vx_local = 0;
+    desired_vy_local = 0;
+    desired_vth = 0;
+    desired_left_speed = 0 ;
+    desired_back_speed = 0;
+    desired_right_speed = 0;
+    hardware->SetRight(0);
+    hardware->SetLeft(0);
+    hardware->SetBack(0);
 
+    frc::SmartDashboard::PutString("Process",  "Done" );
     delay(200);
 }
-
 void Movement::DriveStraight(double distance_cm) {
+    frc::SmartDashboard::PutString("Process",  "Drive Straight" );
     // Positive distance = forward, negative = backward
     double current_x = x_global;
     double current_y = y_global;
@@ -380,9 +430,10 @@ void Movement::DriveStraight(double distance_cm) {
 
     // Call PositionDriver to handle encoder-based motion
     PositionDriver(target_x, target_y, target_th);
+    frc::SmartDashboard::PutString("Process",  "Done" );
 }
-
 void Movement::SideWalk(double distance_cm) {
+    frc::SmartDashboard::PutString("Process",  "Side Walk" );
     // Positive distance = right, negative = left
     double current_x = x_global;
     double current_y = y_global;
@@ -397,36 +448,83 @@ void Movement::SideWalk(double distance_cm) {
 
     // Call PositionDriver to move sideways
     PositionDriver(target_x, target_y, target_th);
+    frc::SmartDashboard::PutString("Process",  "Done" );
 }
+void Movement::align_to_wall(double distance_cm){
+    // this function uses left and right front sharp sensors to align the robot parallel to a wall
+    frc::SmartDashboard::PutString("Process",  "Wall Align" );
+    maintain_heading_enabled = false;
+    desired_vx_local = 0;
+    desired_vy_local = 0;
+    desired_vth = 0;
+    double left_sensor = hardware->getFrontDistance_L();
+    double right_sensor = hardware->getFrontDistance_R();
+    double error = left_sensor - right_sensor;
+    double dist_error = ((left_sensor + right_sensor)/2.0) - distance_cm;
+    while ( abs(dist_error) > 2.0 ){
+        left_sensor = hardware->getFrontDistance_L();
+        right_sensor = hardware->getFrontDistance_R();
+        dist_error = ((left_sensor + right_sensor)/2.0) - distance_cm;
+        error = left_sensor - right_sensor;
 
-void Movement::CorrectHeadingUsingFrontSensors() {
-    double left = hardware->getFilteredFrontDistance_L();
-    double right = hardware->getFilteredFrontDistance_R();
-    double diff = left - right;
-
-    // Log values
-
-    if (fabs(diff) > 0.5) {
-        double correction_speed = 0.2;  // tune this value
-        if (diff > 0) {
-            // Left side farther → rotate slightly left
-            InverseKinematics(0, 0, correction_speed);
-        } else {
-            // Right side farther → rotate slightly right
-            InverseKinematics(0, 0, -correction_speed);
+        if( dist_error > 0 ){ // too far from wall, move forward
+            desired_vx_local = 10;
+            desired_vy_local = 0;
+        }else{ // too close to wall, move backward
+            desired_vx_local = -10;
+            desired_vy_local = 0;
         }
-
-        // Apply correction briefly
-        hardware->SetLeft (desired_left_speed);
-        hardware->SetBack (desired_back_speed);
-        hardware->SetRight(desired_right_speed);
-
-        delay(100); // brief correction
-        hardware->SetLeft (0);
-        hardware->SetBack (0);
-        hardware->SetRight(0);
+        if( error > 0 ){ // left is farther than right, rotate clockwise
+            desired_vth = -0.3 ;//* (error / 20.0); // rad/s
+        }else{ // right is farther than left, rotate counter-clockwise
+            desired_vth = 0.3 ;//* (error / 20.0); // rad/s
+        }
+        delay(50);
     }
+    while( abs(error) > 0.5 ){
+        left_sensor = hardware->getFrontDistance_L();
+        right_sensor = hardware->getFrontDistance_R();
+        error = left_sensor - right_sensor;
+
+        if( error > 5 ){ // left is farther than right, rotate clockwise
+            desired_vx_local = 0;
+            desired_vy_local = 0;
+            //desired_vth = -0.3; // rad/s
+            desired_vth = -0.3 ;//* (error / 20.0); // rad/s
+        }
+        else if( error > 0 ){
+            desired_vx_local = 0;
+            desired_vy_local = 0;
+            desired_vth = -0.15;
+        }
+        else if( error < -5 ){ // right is farther than left, rotate counter-clockwise
+            desired_vx_local = 0;
+            desired_vy_local = 0;
+            desired_vth = 0.3 ;//* (error / 20.0); // rad/s
+        }
+        else{
+            desired_vx_local = 0;
+            desired_vy_local = 0;
+            desired_vth = 0.15;
+        }
+        delay(50);
+    }
+    desired_vx_local = 0;
+    desired_vy_local = 0;
+    desired_vth = 0;
+    desired_left_speed = 0 ;
+    desired_back_speed = 0;
+    desired_right_speed = 0;
+    hardware->SetRight(0);
+    hardware->SetLeft(0);
+    hardware->SetBack(0);
+    
+    
+    frc::SmartDashboard::PutString("Process",  "Done" );
+    delay(200);
+    SetHeading(desired_th);
 }
+
 
 
 
