@@ -96,6 +96,9 @@ bool Hardware::GetStopButton(){
 bool Hardware::GetStartButton(){
     return startButton.Get();
 }
+bool Hardware::GetResetButton(){
+    return resetButton.Get();
+}
 
 double Hardware::GetCobra( int channel ){
     return cobra.GetVoltage(channel);

@@ -27,28 +27,73 @@ int main() {
     std::thread sharp_thread(&Hardware::Update_sharp_sensors_background, &hard); // Start the sharp sensors update in a separate thread
     delay(1000);
 
+    void start_to_court_midpoint(){
+        move.SetPosition( 30, 35, 0 ); 
+        oms.OpenGripper();
+        move.PositionDriver(100,35,0);
+        move.PositionDriver(100,100,0);
+    }
+
 hard.SetRunningLED(false);
 hard.SetStoppedLED(true);
 
 while(1){
+
+   1. /////////////
+
+    manual code
+
+    ///////////
+
+
+    autnomous code()
+
+
+    //////////////////
+
+
+    camera
+
+
+    //////////////////
+
+    simple task one
+
+
+    //////
+
+    sim task two
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     // Wait until the Start Button is pressed
         
         //delay(50);
      while( hard.GetStartButton() ){delay(150); }
-
+    while (false){
+        move.autonomous_mode = false;
+        drive.Execute();
+        delay(50);
+    }
     
 
     hard.SetRunningLED(true);
     hard.SetStoppedLED(false);
-
-    //move.line_align("right");
     
     
-    //from start to midpoint of court
-    move.SetPosition( 30, 35, 0 ); 
-    oms.OpenGripper();
-    move.PositionDriver(100,35,0);
-    move.PositionDriver(100,100,0);
+    start_to_court_midpoint();
+    
     
     //from court midpoint to shelf midpoint
     move.PositionDriver(53,135,90);
