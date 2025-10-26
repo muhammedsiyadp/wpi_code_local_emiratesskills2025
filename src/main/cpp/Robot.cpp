@@ -175,7 +175,7 @@ void autonomous_mode(){
     // put your autonomous code here
     move.autonomous_mode = true;
     set_running_lights(true);
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     start_to_court_midpoint();
     pick_from_shelf_and_goto_court_center(1, 1);
     place_on_stand(1, 3);
@@ -184,7 +184,7 @@ void autonomous_mode(){
     pick_from_shelf_and_goto_court_center(3, 3);
     place_on_stand(1, 1);
     go_back_to_start();
-
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     
 
     
