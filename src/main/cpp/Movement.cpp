@@ -236,6 +236,8 @@ void Movement::ShuffleBoardUpdate(){
     frc::SmartDashboard::PutNumber("robot_th", th_global);
 
     frc::SmartDashboard::PutBoolean("Stop Button",  hardware->GetStopButton() );
+    frc::SmartDashboard::PutBoolean("Start Button",  !hardware->GetStartButton() );
+    frc::SmartDashboard::PutBoolean("Reset Button",  !hardware->GetResetButton() );
 
     frc::SmartDashboard::PutNumber("desired_vx_local",  desired_vx_local );
     frc::SmartDashboard::PutNumber("desired_vy_local",  desired_vy_local );

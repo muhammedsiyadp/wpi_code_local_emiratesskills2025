@@ -54,6 +54,7 @@ class Hardware
         
         bool GetStopButton();
         bool GetStartButton();
+        bool GetResetButton();
 
         double getRightDistance( );
         double getLeftDistance( );
@@ -97,6 +98,7 @@ class Hardware
         AHRS navX{frc::SPI::Port::kMXP};
 
         frc::DigitalInput startButton{constant::START_BUTTON};
+        frc::DigitalInput resetButton{constant::RESET_BUTTON};
         frc::DigitalInput  stopButton{constant::STOP_BUTTON};
 
         frc::DigitalInput limit_high{2};

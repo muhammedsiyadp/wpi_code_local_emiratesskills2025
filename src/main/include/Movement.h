@@ -89,7 +89,7 @@ class Movement
         int current_enc_b ;
         int previous_enc_b;
 
-        const double linear_tolerance  = 4.0;    // [cm]
+        const double linear_tolerance  = 2.0;    // [cm]
         const double angular_tolerance = 3.0;    // [degrees]
 
         const double max_linear_speed = 30.0;    // cm/s

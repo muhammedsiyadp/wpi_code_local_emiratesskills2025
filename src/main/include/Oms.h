@@ -25,6 +25,7 @@ class Oms
 
         double cur_elevator_height = -1000;
         int cur_gripper_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
+        bool elevator_on_target = false;
 
     private:
         int gripper_close_angle = constant::INITIAL_GRIPPER_CLOSE_ANGLE;
@@ -33,7 +34,6 @@ class Oms
         Hardware * hardware;
 
         double elevator_target_height = constant::ELEVATOR_LIMIT_HIGH_HEIGHT;
-        bool elevator_on_target = false;
         bool gripper_closed = false;
 
 };

@@ -33,6 +33,7 @@ namespace constant
     //Inputs
     static constexpr int START_BUTTON   = 9;
     static constexpr int STOP_BUTTON    = 8;
+    static constexpr int RESET_BUTTON   = 2;
 
     //Outputs
     static constexpr int RUNNING_LED    = 12;
