@@ -36,7 +36,7 @@ void from_court_midpoint_to_shelf_center(){
 void pick_from_shelf_and_goto_court_center(int r, int c){
     // Code to pick from shelf
     oms.OpenGripper();
-    from_court_midpoint_to_shelf_center()
+    from_court_midpoint_to_shelf_center();
     //from shelf midpoint to first column
     if (r == 1){
         oms.elevator_set_height(6.7);
@@ -111,32 +111,12 @@ void place_on_stand(int r, int c){
         oms.elevator_set_height(25);
     }
 
-    if (c == 1){
+    if (c == 4){
         //center to stand to first row (right to left)
         move.PositionDriver(160,80,0);
         move.sensor_drive(50 , "right");
         move.sensor_drive(10 , "front_l");
         move.SetPosition(160,80,0);
-        move.line_align("left");
-    }
-    else if (c == 2){
-        move.PositionDriver(160,80,0);
-        move.sensor_drive(50 , "right");
-        move.sensor_drive(10 , "front_l");
-        move.SetPosition(160,80,0);
-        move.line_align("left");
-        move.sidewalk(3);
-        move.line_align("left");
-    }
-    else if (c == 3){
-        move.PositionDriver(160,80,0);
-        move.sensor_drive(50 , "right");
-        move.sensor_drive(10 , "front_l");
-        move.SetPosition(160,80,0);
-        move.line_align("left");
-        move.sidewalk(3);
-        move.line_align("left");
-        move.sidewalk(3);
         move.line_align("left");
     }
     else if (c == 4){
@@ -145,11 +125,31 @@ void place_on_stand(int r, int c){
         move.sensor_drive(10 , "front_l");
         move.SetPosition(160,80,0);
         move.line_align("left");
-        move.sidewalk(3);
+        move.SideWalk(3);
         move.line_align("left");
-        move.sidewalk(3);
+    }
+    else if (c ==2){
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
         move.line_align("left");
-        move.sidewalk(3);
+        move.SideWalk(3);
+        move.line_align("left");
+        move.SideWalk(3);
+        move.line_align("left");
+    }
+    else if (c == 1){
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
+        move.line_align("left");
+        move.SideWalk(3);
+        move.line_align("left");
+        move.SideWalk(3);
+        move.line_align("left");
+        move.SideWalk(3);
         move.line_align("left");
         
     }
@@ -178,11 +178,11 @@ void autonomous_mode(){
 
     start_to_court_midpoint();
     pick_from_shelf_and_goto_court_center(1, 1);
-    place_on_stand(1, 1);
+    place_on_stand(1, 3);
     pick_from_shelf_and_goto_court_center(2, 2);
     place_on_stand(1, 2);
     pick_from_shelf_and_goto_court_center(3, 3);
-    place_on_stand(1, 3);
+    place_on_stand(1, 1);
     go_back_to_start();
 
     
@@ -227,7 +227,7 @@ int main() {
 
 
     int function_index = 0;
-    int no_of_functions = 5;
+    int no_of_functions = 6;
     frc::SmartDashboard::PutString("Function", "Autonomous Mode");
     while(1){
         if (!hard.GetResetButton()){
@@ -256,7 +256,7 @@ int main() {
             delay(400);
 
             if (function_index == 0){ //run the autonomous function
-                // Function 1
+                autonomous_mode();
             }
             else if (function_index == 1){ //run the manual drive function
                 while (hard.GetStopButton()){
