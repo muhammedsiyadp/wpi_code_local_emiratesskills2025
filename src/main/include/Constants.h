@@ -46,7 +46,7 @@ namespace constant
     // Ultrasonic
     static constexpr int RIGHT_TRIG    = 15;
     static constexpr int RIGHT_ECHO    = 11;
-    static constexpr int LEFT_TRIG     = 0;4
+    static constexpr int LEFT_TRIG     = 0;
     static constexpr int LEFT_ECHO     = 1;
 
     // Elevator limits

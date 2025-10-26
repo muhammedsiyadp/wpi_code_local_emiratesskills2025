@@ -3,22 +3,135 @@
  * Release version: 1.0.0.0
  * 
  * Modified by: Muhammed siyad p
- * Last modification date: 22-10-2025
- * New version: 1.2.1.0
+ * Last modification date: 26-10-2025
+ * New version: 1.3.0.0
 
 *************************************/
 
 #include "Robot.h"
 
+Robot r;
+Hardware hard;
+Movement move( &hard );
+Oms oms( &hard );
+OI oi;
+Drive drive( &hard, &move, &oi, &oms );
+
+void set_running_lights(bool running){
+    hard.SetRunningLED(running);
+    hard.SetStoppedLED(!running);
+}
+
+// section for add your autonomous functions
+void start_to_court_midpoint(){
+    move.SetPosition( 30, 35, 0 ); 
+    oms.OpenGripper();
+    move.PositionDriver(100,35,0);
+    move.PositionDriver(100,100,0);
+}
+
+void autonomous_mode(){
+    // put your autonomous code here
+    move.autonomous_mode = true;
+    set_running_lights(true);
+
+    start_to_court_midpoint();
+    
+    
+    //from court midpoint to shelf midpoint
+    move.PositionDriver(53,135,90);
+
+    oms.elevator_set_height(6.7);
+
+    //from shelf midpoint to first column
+    move.PositionDriver(26,162,90);
+    move.sensor_drive(16 , "front_l");
+    move.sensor_drive(52 , "right");
+    move.sensor_drive(16 , "front_l");
+    move.SetPosition(26,162,90);
+    move.line_align("right");
+
+
+    //pick and come to court centre
+    move.DriveStraight(10);
+    oms.CloseGripper();
+    delay(1000);
+    move.DriveStraight(-12);
+    move.PositionDriver(100,100,0);
+
+    oms.elevator_set_height(12);
+
+    //center to stand to first row (right to left)
+    move.PositionDriver(160,80,0);
+    move.sensor_drive(50 , "right");
+    move.sensor_drive(10 , "front_l");
+    move.SetPosition(160,80,0);
+    move.line_align("left");
+
+    //place and go back
+    move.DriveStraight(11);
+    oms.OpenGripper();
+    delay(2000);
+    move.DriveStraight(-13);
+    move.PositionDriver(100,100,0);
+
+    oms.elevator_set_height(18.5);
+
+    //from court midpoint to shelf midpoint
+    move.PositionDriver(53,135,90);
+
+    //from shelf midpoint to first column
+    move.PositionDriver(26,162,90);
+    move.sensor_drive(16 , "front_l");
+    move.sensor_drive(52 , "right");
+    move.sensor_drive(16 , "front_l");
+    move.SetPosition(26,162,90);
+    move.line_align("right");
+
+     //pick and come to court centre
+    move.DriveStraight(10);
+    oms.CloseGripper();
+    delay(1000);
+    move.DriveStraight(-12);
+    move.PositionDriver(100,100,0);
+
+    oms.elevator_set_height(18.5);
+
+    //center to stand to first row (right to left)
+    move.PositionDriver(160,80,0);
+    move.sensor_drive(50 , "right");
+    move.sensor_drive(10 , "front_l");
+    move.SetPosition(160,80,0);
+    move.line_align("left");
+
+    //place and go back
+    move.DriveStraight(11);
+    oms.OpenGripper();
+    delay(2000);
+    move.DriveStraight(-13);
+    move.PositionDriver(100,100,0);
+
+
+}
+// end of autonomous functions section
+
+// section for adding your simple tasks functions
+void simple_task_1(){
+    // Code for simple task 1
+}
+
+void simple_task_2(){
+    // Code for simple task 2
+}
+
+void simple_task_3(){
+    // Code for simple task 3
+}
+
 int main() { 
 
-    Robot r;
     r.ds.Enable();
-    Hardware hard;
-    Movement move( &hard );
-    Oms oms( &hard );
-    OI oi;
-    Drive drive( &hard, &move, &oi, &oms );
+    
 
     std::thread oms_thread(&Oms::oms_maintain_height, &oms); // Start the elevator maintain height in a separate thread (background)
     std::thread movement_thread(&Movement::BackgroundTasks, &move); // Start the movement background tasks in a separate thread
@@ -26,40 +139,7 @@ int main() {
     delay(1000);
 
 
-    void set_running_lights(bool running){
-        hard.SetRunningLED(running);
-        hard.SetStoppedLED(!running);
-    }
-
-    // section for add your autonomous functions
-    void start_to_court_midpoint(){
-        move.SetPosition( 30, 35, 0 ); 
-        oms.OpenGripper();
-        move.PositionDriver(100,35,0);
-        move.PositionDriver(100,100,0);
-    }
-
-    void autonomous_mode(){
-        // put your autonomous code here
-        move.autonomous_mode = true;
-        set_running_lights(true);
-
-
-    }
-    // end of autonomous functions section
-
-    // section for adding your simple tasks functions
-    void simple_task_1(){
-        // Code for simple task 1
-    }
-
-    void simple_task_2(){
-        // Code for simple task 2
-    }
-
-    void simple_task_3(){
-        // Code for simple task 3
-    }
+    
     // end of simple tasks functions section
 
 
