@@ -119,7 +119,7 @@ void place_on_stand(int r, int c){
         move.SetPosition(160,80,0);
         move.line_align("left");
     }
-    else if (c == 4){
+    else if (c == 3){
         move.PositionDriver(160,80,0);
         move.sensor_drive(50 , "right");
         move.sensor_drive(10 , "front_l");
