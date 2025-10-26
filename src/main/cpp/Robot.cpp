@@ -29,28 +29,65 @@ void start_to_court_midpoint(){
     move.PositionDriver(100,35,0);
     move.PositionDriver(100,100,0);
 }
-
-void autonomous_mode(){
-    // put your autonomous code here
-    move.autonomous_mode = true;
-    set_running_lights(true);
-
-    start_to_court_midpoint();
-    
-    
-    //from court midpoint to shelf midpoint
+void from_court_midpoint_to_shelf_center(){
     move.PositionDriver(53,135,90);
+}
 
-    oms.elevator_set_height(6.7);
-
+void pick_from_shelf_and_goto_court_center(int r, int c){
+    // Code to pick from shelf
+    oms.OpenGripper();
+    from_court_midpoint_to_shelf_center()
     //from shelf midpoint to first column
-    move.PositionDriver(26,162,90);
-    move.sensor_drive(16 , "front_l");
-    move.sensor_drive(52 , "right");
-    move.sensor_drive(16 , "front_l");
-    move.SetPosition(26,162,90);
-    move.line_align("right");
+    if (r == 1){
+        oms.elevator_set_height(6.7);
+    }
+    else if (r == 2){
+        oms.elevator_set_height(18.5);
+    }
+    else if (r == 3){
+        oms.elevator_set_height(30);
+    }
 
+
+    if (c == 1){
+        move.PositionDriver(26,162,90);
+        move.sensor_drive(16 , "front_l");
+        move.sensor_drive(52 , "right");
+        move.sensor_drive(16 , "front_l");
+        move.SetPosition(26,162,90);
+        move.line_align("right");
+    }
+    else if (c == 2){
+        move.PositionDriver(26,162,90);
+        move.sensor_drive(16 , "front_l");
+        move.sensor_drive(52 , "right");
+        move.sensor_drive(16 , "front_l");
+        move.SetPosition(26,162,90);
+        move.sensor_drive(37 , "right");
+        move.line_align("right");
+    }
+    else if (c == 3){
+        move.PositionDriver(74,162,90);
+        move.sensor_drive(15 , "front_r");
+        move.sensor_drive(53 , "left");
+        move.sensor_drive(15 , "front_r");
+        move.SetPosition(74,162,90);
+        move.sensor_drive(46 , "left");
+        move.line_align("left");
+    }
+    else if (c == 4){
+        move.PositionDriver(74,162,90);
+        move.sensor_drive(15 , "front_r");
+        move.sensor_drive(53 , "left");
+        move.sensor_drive(15 , "front_r");
+        move.SetPosition(74,162,90);
+        move.line_align("left");
+    }
+    while (oms.elevator_on_target == false){
+        delay(100);
+    }
+    
+    
 
     //pick and come to court centre
     move.DriveStraight(10);
@@ -59,14 +96,67 @@ void autonomous_mode(){
     move.DriveStraight(-12);
     move.PositionDriver(100,100,0);
 
-    oms.elevator_set_height(12);
 
-    //center to stand to first row (right to left)
-    move.PositionDriver(160,80,0);
-    move.sensor_drive(50 , "right");
-    move.sensor_drive(10 , "front_l");
-    move.SetPosition(160,80,0);
-    move.line_align("left");
+}
+void place_on_stand(int r, int c){
+    // Code to place at court center
+
+    if (r == 1){
+        oms.elevator_set_height(12);
+    }
+    else if (r == 2){
+        oms.elevator_set_height(18.5);
+    }
+    else if (r == 3){
+        oms.elevator_set_height(25);
+    }
+
+    if (c == 1){
+        //center to stand to first row (right to left)
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
+        move.line_align("left");
+    }
+    else if (c == 2){
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+    }
+    else if (c == 3){
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+    }
+    else if (c == 4){
+        move.PositionDriver(160,80,0);
+        move.sensor_drive(50 , "right");
+        move.sensor_drive(10 , "front_l");
+        move.SetPosition(160,80,0);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+        move.sidewalk(3);
+        move.line_align("left");
+        
+    }
+
+    while (oms.elevator_on_target == false){ //wait for elevator to reach target height
+        delay(100);
+    }
 
     //place and go back
     move.DriveStraight(11);
@@ -74,42 +164,35 @@ void autonomous_mode(){
     delay(2000);
     move.DriveStraight(-13);
     move.PositionDriver(100,100,0);
+    
+}
+void go_back_to_start(){
+    // Code to return to start position
+    move.PositionDriver(100,35,0);
+    move.PositionDriver(30,35,0);
+}
+void autonomous_mode(){
+    // put your autonomous code here
+    move.autonomous_mode = true;
+    set_running_lights(true);
 
-    oms.elevator_set_height(18.5);
+    start_to_court_midpoint();
+    pick_from_shelf_and_goto_court_center(1, 1);
+    place_on_stand(1, 1);
+    pick_from_shelf_and_goto_court_center(2, 2);
+    place_on_stand(1, 2);
+    pick_from_shelf_and_goto_court_center(3, 3);
+    place_on_stand(1, 3);
+    go_back_to_start();
 
-    //from court midpoint to shelf midpoint
-    move.PositionDriver(53,135,90);
+    
 
-    //from shelf midpoint to first column
-    move.PositionDriver(26,162,90);
-    move.sensor_drive(16 , "front_l");
-    move.sensor_drive(52 , "right");
-    move.sensor_drive(16 , "front_l");
-    move.SetPosition(26,162,90);
-    move.line_align("right");
+    
 
-     //pick and come to court centre
-    move.DriveStraight(10);
-    oms.CloseGripper();
-    delay(1000);
-    move.DriveStraight(-12);
-    move.PositionDriver(100,100,0);
 
-    oms.elevator_set_height(18.5);
+    
+    
 
-    //center to stand to first row (right to left)
-    move.PositionDriver(160,80,0);
-    move.sensor_drive(50 , "right");
-    move.sensor_drive(10 , "front_l");
-    move.SetPosition(160,80,0);
-    move.line_align("left");
-
-    //place and go back
-    move.DriveStraight(11);
-    oms.OpenGripper();
-    delay(2000);
-    move.DriveStraight(-13);
-    move.PositionDriver(100,100,0);
 
 
 }
